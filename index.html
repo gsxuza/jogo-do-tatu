@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tatu do Foco — Desafio dos Valores</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; overflow:hidden; font-family:'Trebuchet MS','Segoe UI',sans-serif; }
+  body {
+    background:linear-gradient(#7ec8ff 0%, #aee1ff 55%, #d8b98a 55%, #c9a877 100%);
+    display:flex; align-items:center; justify-content:center;
+    user-select:none;
+  }
+  #wrap { position:relative; width:100%; max-width:900px; aspect-ratio:16/9; max-height:100vh; }
+  canvas { display:block; width:100%; height:100%; }
+  .overlay {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    background:rgba(20,30,50,.82); color:#fff; padding:20px; gap:14px;
+  }
+  .overlay.hidden { display:none; }
+  .overlay h1 { font-size:clamp(22px,5vw,40px); letter-spacing:-1px; }
+  .overlay h1 .em { color:#ffd24d; }
+  .overlay p { font-size:clamp(13px,2.6vw,17px); max-width:520px; line-height:1.5; opacity:.92; }
+  .btn {
+    margin-top:6px; background:#ffd24d; color:#1a2438; border:none;
+    padding:14px 34px; font-size:clamp(16px,3vw,20px); font-weight:800;
+    border-radius:40px; cursor:pointer; box-shadow:0 5px 0 #c99a1e;
+    transition:transform .05s;
+  }
+  .btn:active { transform:translateY(3px); box-shadow:0 2px 0 #c99a1e; }
+  .val { display:flex; gap:10px; margin-top:4px; flex-wrap:wrap; justify-content:center; }
+  .pill { padding:6px 16px; border-radius:30px; font-weight:700; font-size:clamp(11px,2.4vw,14px); }
+  .pill.c { background:#2563eb; } .pill.a { background:#ea580c; }
+  .hud {
+    position:absolute; top:10px; left:12px; right:12px; display:flex;
+    justify-content:space-between; color:#1a2438; font-weight:800;
+    font-size:clamp(13px,2.6vw,18px); text-shadow:0 1px 0 rgba(255,255,255,.5);
+    pointer-events:none;
+  }
+  .final { font-size:clamp(15px,3vw,20px); color:#ffd24d; font-weight:800; }
+  .hint { font-size:clamp(11px,2.2vw,13px); opacity:.7; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game"></canvas>
+  <div class="hud"><div id="score">🧩 0</div><div id="dist">0 m</div></div>
+
+  <div class="overlay" id="start">
+    <h1>Tatu do <span class="em">Foco</span></h1>
+    <div class="val"><span class="pill c">Concentração</span><span class="pill a">Agilidade</span></div>
+    <p>Ajude o tatu a coletar as <b>peças do quebra-cabeça</b> 🧩 e desviar das <b>distrações</b> que roubam o foco 📱💤. Quanto mais peças, mais perto de completar o desafio!</p>
+    <p class="hint">Toque na tela / clique / barra de espaço para pular.<br>Segure para pular mais alto.</p>
+    <button class="btn" id="startBtn">Começar</button>
+  </div>
+
+  <div class="overlay hidden" id="over">
+    <h1 id="overTitle">Ufa!</h1>
+    <div class="final" id="finalScore">🧩 0 peças</div>
+    <p id="overMsg"></p>
+    <button class="btn" id="retryBtn">Jogar de novo</button>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('game');
+const ctx = cv.getContext('2d');
+let W, H, scale;
+function resize(){
+  const r = cv.getBoundingClientRect();
+  scale = window.devicePixelRatio || 1;
+  cv.width = r.width * scale; cv.height = r.height * scale;
+  W = r.width; H = r.height;
+  ctx.setTransform(scale,0,0,scale,0,0);
+}
+window.addEventListener('resize', resize);
+
+// ---- game state ----
+let state = 'start';
+let groundY, tatu, obstacles, pieces, clouds, speed, dist, score, spawnT, pieceT, holdJump, jumpHeld;
+
+function reset(){
+  groundY = H * 0.78;
+  tatu = { x: W*0.16, y: groundY, w: 54, h: 40, vy:0, onGround:true, ball:0 };
+  obstacles = []; pieces = []; clouds = [];
+  for(let i=0;i<4;i++) clouds.push({x:Math.random()*W, y:20+Math.random()*H*0.28, s:0.3+Math.random()*0.5, r:18+Math.random()*22});
+  speed = 4.2; dist = 0; score = 0; spawnT = 60; pieceT = 40; holdJump=0; jumpHeld=false;
+}
+
+// ---- input ----
+function jump(){
+  if(state!=='play') return;
+  if(tatu.onGround){ tatu.vy = -12.2; tatu.onGround=false; holdJump=1; jumpHeld=true; tatu.ball=1; }
+}
+function endJump(){ jumpHeld=false; }
+cv.parentElement.addEventListener('pointerdown', e=>{ jump(); });
+window.addEventListener('pointerup', endJump);
+window.addEventListener('keydown', e=>{ if(e.code==='Space'){ e.preventDefault(); jump(); }});
+window.addEventListener('keyup', e=>{ if(e.code==='Space') endJump(); });
+
+document.getElementById('startBtn').onclick = start;
+document.getElementById('retryBtn').onclick = start;
+function start(){
+  document.getElementById('start').classList.add('hidden');
+  document.getElementById('over').classList.add('hidden');
+  resize(); reset(); state='play';
+}
+
+// ---- drawing ----
+function drawTatu(t){
+  const cx=t.x, cy=t.y;
+  ctx.save();
+  ctx.translate(cx, cy);
+  const roll = t.onGround?0:(Math.sin(dist*0.4));
+  ctx.fillStyle='#8a6a4f';
+  ctx.strokeStyle='#5f4531'; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.ellipse(0,-t.h*0.45,t.w*0.5,t.h*0.5,0,0,Math.PI*2);
+  ctx.fill(); ctx.stroke();
+  ctx.strokeStyle='#6f503a'; ctx.lineWidth=2;
+  for(let i=-2;i<=2;i++){
+    ctx.beginPath();
+    ctx.moveTo(i*8,-t.h*0.9);
+    ctx.lineTo(i*8,0);
+    ctx.stroke();
+  }
+  ctx.fillStyle='#a3805f';
+  ctx.beginPath();
+  ctx.ellipse(t.w*0.42,-t.h*0.35,10,8,0,0,Math.PI*2);
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(t.w*0.55,-t.h*0.30,5,4,0,0,Math.PI*2);
+  ctx.fillStyle='#8a6a4f'; ctx.fill();
+  ctx.fillStyle='#1a1a1a';
+  ctx.beginPath(); ctx.arc(t.w*0.44,-t.h*0.45,2,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#5f4531'; ctx.lineWidth=4; ctx.lineCap='round';
+  const legp = t.onGround? Math.sin(dist*0.6)*4 : 0;
+  ctx.beginPath(); ctx.moveTo(-8,-2); ctx.lineTo(-8+legp,6); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(8,-2); ctx.lineTo(8-legp,6); ctx.stroke();
+  ctx.restore();
+}
+function drawPiece(p){
+  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+  const s=p.s;
+  ctx.fillStyle=p.color; ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.rect(-s/2,-s/2,s,s);
+  ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(s/2,0,s*0.22,0,Math.PI*2); ctx.fillStyle=p.color; ctx.fill(); ctx.stroke();
+  ctx.restore();
+  p.rot+=0.03;
+}
+function drawObstacle(o){
+  ctx.save(); ctx.translate(o.x,o.y);
+  if(o.type==='phone'){
+    ctx.fillStyle='#222'; ctx.strokeStyle='#000'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(-o.w/2,-o.h,o.w,o.h,5); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#4da3ff'; ctx.fillRect(-o.w/2+3,-o.h+5,o.w-6,o.h-12);
+    ctx.fillStyle='#fff'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('!', 0,-o.h*0.45);
+  } else {
+    ctx.fillStyle='#c94f4f'; ctx.strokeStyle='#8f2f2f'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(-o.w/2,0); ctx.lineTo(0,-o.h); ctx.lineTo(o.w/2,0); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#fff'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('z', 0,-o.h*0.4);
+  }
+  ctx.restore();
+}
+function drawCloud(c){
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.beginPath();
+  ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+  ctx.arc(c.x+c.r,c.y+4,c.r*0.8,0,Math.PI*2);
+  ctx.arc(c.x-c.r,c.y+4,c.r*0.8,0,Math.PI*2);
+  ctx.fill();
+}
+
+const pieceColors=['#2563eb','#ea580c','#16a34a','#dc2626','#7c3aed','#0891b2','#ca8a04','#db2777'];
+
+function loop(){
+  requestAnimationFrame(loop);
+  ctx.clearRect(0,0,W,H);
+
+  ctx.fillStyle='#c9a877'; ctx.fillRect(0,groundY+6,W,H-groundY);
+  ctx.fillStyle='#b8975f'; ctx.fillRect(0,groundY+6,W,4);
+
+  for(const c of clouds){
+    drawCloud(c);
+    if(state==='play') c.x-=speed*c.s;
+    if(c.x<-c.r*2){ c.x=W+c.r*2; c.y=20+Math.random()*H*0.28; }
+  }
+
+  if(state==='play'){
+    dist += speed;
+    speed += 0.0016;
+    document.getElementById('dist').textContent = Math.floor(dist/10)+' m';
+    document.getElementById('score').textContent = '🧩 '+score;
+
+    if(jumpHeld && holdJump>0 && holdJump<9){ tatu.vy-=0.55; holdJump++; }
+    tatu.vy += 0.62;
+    tatu.y += tatu.vy;
+    if(tatu.y>=groundY){ tatu.y=groundY; tatu.vy=0; tatu.onGround=true; tatu.ball=0; }
+
+    if(--spawnT<=0){
+      const type = Math.random()<0.5?'phone':'sleep';
+      obstacles.push({x:W+40, y:groundY+6, w:26, h:type==='phone'?38:34, type});
+      spawnT = 70 + Math.random()*60 - Math.min(30, dist/400);
+    }
+    if(--pieceT<=0){
+      const base = groundY - 40 - Math.random()*90;
+      const n = 1+Math.floor(Math.random()*3);
+      for(let i=0;i<n;i++){
+        pieces.push({x:W+40+i*34, y:base - Math.sin(i/ (n))*20, s:22, rot:Math.random()*6, color:pieceColors[Math.floor(Math.random()*8)]});
+      }
+      pieceT = 55 + Math.random()*50;
+    }
+
+    for(let i=obstacles.length-1;i>=0;i--){
+      const o=obstacles[i]; o.x-=speed;
+      drawObstacle(o);
+      if(Math.abs(o.x - tatu.x) < 24 && (tatu.y - tatu.h*0.5) > (o.y - o.h)){
+        gameOver();
+      }
+      if(o.x<-40) obstacles.splice(i,1);
+    }
+    for(let i=pieces.length-1;i>=0;i--){
+      const p=pieces[i]; p.x-=speed;
+      drawPiece(p);
+      const dx=p.x-tatu.x, dy=p.y-(tatu.y-tatu.h*0.5);
+      if(dx*dx+dy*dy < 34*34){ pieces.splice(i,1); score++; continue; }
+      if(p.x<-40) pieces.splice(i,1);
+    }
+    drawTatu(tatu);
+
+  } else {
+    for(const o of obstacles) drawObstacle(o);
+    for(const p of pieces) drawPiece(p);
+    drawTatu(tatu);
+  }
+}
+
+function gameOver(){
+  state='over';
+  const ov=document.getElementById('over');
+  document.getElementById('finalScore').textContent='🧩 '+score+' peças coletadas';
+  let title, msg;
+  if(score>=40){ title='Foco de mestre! 🏆'; msg='Concentração e agilidade em alta. Você é o tipo de tatu que completa qualquer quebra-cabeça.'; }
+  else if(score>=20){ title='Muito bem! 🎯'; msg='Boa coleta! Mantenha o foco e desvie das distrações que você vai longe.'; }
+  else { title='Quase lá! 💪'; msg='As distrações pegaram o tatu. Bora de novo — foco na peça, atenção no obstáculo!'; }
+  document.getElementById('overTitle').textContent=title;
+  document.getElementById('overMsg').textContent=msg;
+  ov.classList.remove('hidden');
+}
+
+resize(); reset(); loop();
+</script>
+</body>
+</html>
