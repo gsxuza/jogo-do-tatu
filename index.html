@@ -7,104 +7,167 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { height:100%; overflow:hidden; font-family:'Trebuchet MS','Segoe UI',sans-serif; }
-  body { background:#0d1520; display:flex; align-items:center; justify-content:center; user-select:none; }
+  body { background:#070d18; display:flex; align-items:center; justify-content:center; user-select:none; }
   #wrap { position:relative; width:100%; max-width:900px; aspect-ratio:16/9; max-height:100vh; }
   canvas { display:block; width:100%; height:100%; }
 
+  /* ── full-viewport overlays ── */
   .overlay {
-    position:absolute; inset:0; display:flex; flex-direction:column;
-    align-items:center; justify-content:flex-start; text-align:center;
-    background:rgba(10,18,32,.94); color:#fff;
-    padding:clamp(10px,1.8vw,20px) clamp(14px,3vw,32px);
-    gap:clamp(6px,1.2vw,12px); overflow-y:auto;
+    position:fixed; inset:0; z-index:100;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-start;
+    overflow-y:auto; overflow-x:hidden;
+    background:radial-gradient(ellipse 130% 55% at 50% 0%,
+      rgba(13,32,64,.98) 0%, rgba(7,13,24,.98) 62%);
+    color:#fff;
   }
   .overlay.hidden { display:none; }
   .overlay.centered { justify-content:center; }
 
-  .brand { display:flex; flex-direction:column; align-items:center; gap:1px; }
-  .brand-logo { font-size:clamp(20px,5vw,40px); font-weight:900; letter-spacing:3px; color:#F5A500; text-transform:uppercase; line-height:1; }
-  .brand-sub  { font-size:clamp(9px,1.7vw,12px); font-weight:700; letter-spacing:2px; color:rgba(255,255,255,.5); text-transform:uppercase; }
+  .o-inner {
+    width:100%; max-width:480px;
+    padding:clamp(24px,4vh,52px) clamp(22px,5vw,44px);
+    display:flex; flex-direction:column;
+    align-items:center; gap:clamp(12px,2.2vh,20px);
+    text-align:center;
+  }
+
+  /* ── brand hero ── */
+  .hero-emoji {
+    font-size:clamp(52px,10vh,84px); line-height:1;
+    filter:drop-shadow(0 6px 24px rgba(245,165,0,.38));
+  }
+  .brand { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .brand-logo {
+    font-size:clamp(30px,7vw,62px); font-weight:900;
+    letter-spacing:4px; color:#F5A500; text-transform:uppercase;
+    line-height:1.05;
+    text-shadow:0 0 40px rgba(245,165,0,.48), 0 5px 0 #b87800;
+  }
+  .brand-sub {
+    font-size:clamp(10px,1.8vw,13px); font-weight:700;
+    letter-spacing:2.5px; color:rgba(255,255,255,.38); text-transform:uppercase;
+  }
+
   .badge {
-    display:inline-flex; align-items:center; gap:5px;
-    background:rgba(245,165,0,.12); border:1px solid rgba(245,165,0,.3);
-    color:#F5A500; padding:3px 12px; border-radius:20px;
-    font-size:clamp(10px,1.7vw,12px); font-weight:700; letter-spacing:.5px;
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(245,165,0,.09); border:1px solid rgba(245,165,0,.25);
+    color:rgba(245,165,0,.9); padding:5px 18px; border-radius:24px;
+    font-size:clamp(11px,1.8vw,13px); font-weight:700; letter-spacing:.4px;
   }
-  .sep { width:100%; height:1px; background:rgba(255,255,255,.09); flex-shrink:0; }
+  .sep { width:60px; height:2px; background:rgba(245,165,0,.22); border-radius:2px; flex-shrink:0; }
 
-  .desc { font-size:clamp(12px,2.1vw,15px); max-width:460px; line-height:1.5; opacity:.85; }
-  .lbl  { font-size:clamp(10px,1.7vw,12px); font-weight:700; letter-spacing:.8px; text-transform:uppercase; opacity:.6; }
-  .hint { font-size:clamp(10px,1.7vw,12px); opacity:.5; line-height:1.5; }
-
-  #nameInput {
-    width:100%; max-width:280px; padding:9px 18px; border-radius:30px;
-    border:2px solid rgba(255,255,255,.12); background:rgba(255,255,255,.07);
-    font-size:clamp(13px,2.4vw,16px); font-weight:700; text-align:center;
-    color:#fff; outline:none; transition:border .15s;
-  }
-  #nameInput::placeholder { color:rgba(255,255,255,.3); }
-  #nameInput:focus { border-color:#F5A500; }
-
-  /* setor chips */
-  .setores { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; max-width:480px; }
-  .setor {
-    padding:5px 12px; border-radius:22px; font-size:clamp(10px,1.8vw,12px);
-    font-weight:800; cursor:pointer; color:#fff; border:2px solid transparent;
-    opacity:.5; transition:opacity .12s, transform .06s;
-  }
-  .setor:active { transform:scale(.94); }
-  .setor.sel { opacity:1; border-color:rgba(255,255,255,.75); }
-
-  .btn {
-    background:#F5A500; color:#0d1520; border:none;
-    padding:clamp(10px,1.8vw,13px) clamp(26px,4.5vw,38px);
-    font-size:clamp(14px,2.6vw,18px); font-weight:900;
-    border-radius:40px; cursor:pointer; box-shadow:0 5px 0 #b87800;
-    transition:transform .05s; letter-spacing:.4px;
-  }
-  .btn:active { transform:translateY(3px); box-shadow:0 2px 0 #b87800; }
-  .btn.ghost { background:transparent; color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.25) inset; padding:10px 24px; }
-  .btn.ghost:active { box-shadow:0 0 0 2px rgba(255,255,255,.15) inset; }
-  .btn.share { background:#25d366; color:#0a2918; box-shadow:0 5px 0 #128c42; }
-  .btn.share:active { box-shadow:0 2px 0 #128c42; }
-  .rowbtns { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-
-  .stat { font-size:clamp(10px,1.8vw,13px); opacity:.65; }
+  /* ── copy ── */
+  .desc { font-size:clamp(13px,2.2vw,16px); max-width:380px; line-height:1.65; opacity:.8; }
+  .lbl  { font-size:clamp(10px,1.7vw,11px); font-weight:700; letter-spacing:1.2px; text-transform:uppercase; opacity:.45; width:100%; text-align:left; }
+  .hint { font-size:clamp(10px,1.6vw,12px); opacity:.38; line-height:1.6; }
+  .stat { font-size:clamp(11px,1.8vw,13px); opacity:.55; }
   .stat b { color:#F5A500; opacity:1; }
 
-  .att-row { display:flex; gap:7px; justify-content:center; width:100%; max-width:360px; }
-  .att-card { flex:1; min-width:70px; padding:7px 8px; border-radius:10px; background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.09); }
-  .att-card .att-label { font-size:clamp(9px,1.5vw,10px); font-weight:700; text-transform:uppercase; opacity:.5; margin-bottom:2px; }
-  .att-card .att-val   { font-size:clamp(15px,2.8vw,20px); font-weight:900; color:#F5A500; }
-  .att-card .att-val.empty { color:rgba(255,255,255,.18); }
+  /* ── name input ── */
+  #nameInput {
+    width:100%; padding:13px 22px; border-radius:34px;
+    border:2px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06);
+    font-size:clamp(14px,2.5vw,17px); font-weight:700; text-align:center;
+    color:#fff; outline:none; transition:border .15s, background .15s;
+  }
+  #nameInput::placeholder { color:rgba(255,255,255,.25); }
+  #nameInput:focus { border-color:#F5A500; background:rgba(245,165,0,.07); }
+
+  /* ── sector chips — 4-col grid, 2-col on narrow ── */
+  .setores {
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:8px; width:100%;
+  }
+  @media(max-width:480px){ .setores { grid-template-columns:repeat(2,1fr); } }
+  .setor {
+    padding:11px 6px; border-radius:10px;
+    font-size:clamp(11px,1.9vw,13px); font-weight:800;
+    cursor:pointer; color:#fff; border:2px solid transparent;
+    opacity:.42; transition:opacity .12s, transform .06s;
+    text-align:center; line-height:1.25;
+  }
+  .setor:active { transform:scale(.92); }
+  .setor.sel {
+    opacity:1; border-color:rgba(255,255,255,.72);
+    box-shadow:0 0 14px rgba(255,255,255,.12);
+  }
+
+  /* ── buttons ── */
+  .btn {
+    background:#F5A500; color:#0d1520; border:none;
+    padding:clamp(14px,2.4vh,18px) clamp(30px,5vw,44px);
+    font-size:clamp(15px,2.8vw,19px); font-weight:900;
+    border-radius:40px; cursor:pointer; box-shadow:0 6px 0 #b87800;
+    transition:transform .05s; letter-spacing:.4px;
+    width:100%; max-width:340px;
+  }
+  .btn:active { transform:translateY(3px); box-shadow:0 3px 0 #b87800; }
+  .btn.ghost {
+    background:transparent; color:rgba(255,255,255,.78);
+    box-shadow:0 0 0 2px rgba(255,255,255,.18) inset;
+    width:auto; padding:13px 28px; font-size:clamp(14px,2.4vw,17px);
+  }
+  .btn.ghost:active { box-shadow:0 0 0 2px rgba(255,255,255,.1) inset; }
+  .btn.share { background:#25d366; color:#0a2918; box-shadow:0 6px 0 #128c42; }
+  .btn.share:active { box-shadow:0 3px 0 #128c42; }
+  .rowbtns { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; width:100%; }
+
+  /* ── scores ── */
+  .big-score {
+    font-size:clamp(34px,7vh,56px); font-weight:900; color:#F5A500;
+    line-height:1; text-shadow:0 0 30px rgba(245,165,0,.42);
+  }
+  .tier-pill {
+    display:inline-block; background:rgba(245,165,0,.12);
+    border:1px solid rgba(245,165,0,.28); color:#F5A500;
+    padding:5px 20px; border-radius:24px;
+    font-size:clamp(12px,2.2vw,15px); font-weight:800;
+  }
+
+  /* ── attempt cards ── */
+  .att-row { display:flex; gap:8px; justify-content:center; width:100%; max-width:340px; }
+  .att-card {
+    flex:1; min-width:0; padding:10px 8px; border-radius:12px;
+    background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.08);
+    text-align:center;
+  }
+  .att-card .att-label { font-size:clamp(9px,1.4vw,10px); font-weight:700; text-transform:uppercase; opacity:.4; margin-bottom:4px; }
+  .att-card .att-val   { font-size:clamp(15px,2.8vw,21px); font-weight:900; color:#F5A500; }
+  .att-card .att-val.empty { color:rgba(255,255,255,.14); }
   .att-card.best    { border-color:#F5A500; background:rgba(245,165,0,.1); }
-  .att-card.current { border-color:rgba(255,255,255,.3); }
+  .att-card.current { border-color:rgba(255,255,255,.26); }
 
-  .big-score { font-size:clamp(26px,5.5vw,44px); font-weight:900; color:#F5A500; line-height:1; }
-  .tier-pill { display:inline-block; background:rgba(245,165,0,.15); border:1px solid rgba(245,165,0,.3); color:#F5A500; padding:4px 16px; border-radius:20px; font-size:clamp(12px,2.2vw,15px); font-weight:800; }
-
-  /* two-column layout for rankings */
-  .rankings { display:flex; gap:10px; width:100%; max-width:480px; align-items:flex-start; }
-  .rank-col  { flex:1; text-align:left; }
-  .rank-title { font-size:clamp(9px,1.6vw,11px); font-weight:700; text-transform:uppercase; opacity:.55; margin-bottom:4px; letter-spacing:.5px; }
-
-  /* top-5 jogadores */
+  /* ── rankings ── */
+  .rankings { display:flex; gap:12px; width:100%; align-items:flex-start; }
+  .rank-col  { flex:1; text-align:left; min-width:0; }
+  .rank-title {
+    font-size:clamp(9px,1.6vw,11px); font-weight:700; text-transform:uppercase;
+    opacity:.48; margin-bottom:6px; letter-spacing:.6px;
+  }
   .scores { list-style:none; padding:0; }
-  .scores li { display:flex; justify-content:space-between; padding:3px 8px; border-radius:6px; font-size:clamp(10px,1.8vw,12px); font-weight:700; }
-  .scores li:nth-child(odd){ background:rgba(255,255,255,.05); }
-  .scores li.you { background:rgba(245,165,0,.15); color:#F5A500; }
-
-  /* sector ranking */
+  .scores li {
+    display:flex; justify-content:space-between;
+    padding:4px 8px; border-radius:6px;
+    font-size:clamp(10px,1.8vw,12px); font-weight:700; gap:8px;
+  }
+  .scores li:nth-child(odd){ background:rgba(255,255,255,.04); }
+  .scores li.you { background:rgba(245,165,0,.13); color:#F5A500; }
   .setor-rank { list-style:none; padding:0; }
-  .setor-rank li { display:flex; align-items:center; gap:5px; padding:3px 6px; border-radius:6px; font-size:clamp(10px,1.7vw,11px); font-weight:700; }
+  .setor-rank li {
+    display:flex; align-items:center; gap:5px;
+    padding:4px 6px; border-radius:6px;
+    font-size:clamp(10px,1.7vw,11px); font-weight:700;
+  }
   .setor-rank li:nth-child(odd){ background:rgba(255,255,255,.04); }
   .setor-rank li.mine { background:rgba(245,165,0,.12); }
   .s-dot  { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
   .s-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .s-bar-wrap { width:clamp(28px,4vw,44px); height:4px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; flex-shrink:0; }
   .s-bar  { height:100%; border-radius:2px; }
-  .s-val  { min-width:20px; text-align:right; opacity:.8; }
+  .s-val  { min-width:22px; text-align:right; opacity:.72; }
 
+  /* ── in-game HUD (inside #wrap) ── */
   .hud {
     position:absolute; top:10px; left:12px; right:12px; display:flex;
     justify-content:space-between; align-items:flex-start;
@@ -117,22 +180,32 @@
 
   #pauseBtn {
     position:absolute; top:10px; left:50%; transform:translateX(-50%);
-    width:36px; height:36px; border-radius:50%; border:1.5px solid rgba(245,165,0,.35);
-    cursor:pointer; background:rgba(10,18,32,.65); color:#F5A500;
+    width:36px; height:36px; border-radius:50%;
+    border:1.5px solid rgba(245,165,0,.35); cursor:pointer;
+    background:rgba(7,13,24,.7); color:#F5A500;
     font-size:14px; display:none; align-items:center; justify-content:center; z-index:5;
   }
   #pauseBtn.show { display:flex; }
 
-  #count { position:absolute; inset:0; display:none; align-items:center; justify-content:center; pointer-events:none; z-index:6; background:rgba(10,18,32,.55); }
+  #count {
+    position:absolute; inset:0; display:none;
+    align-items:center; justify-content:center;
+    pointer-events:none; z-index:6; background:rgba(7,13,24,.55);
+  }
   #count.show { display:flex; }
-  #count span { font-size:clamp(64px,18vw,148px); font-weight:900; color:#F5A500; text-shadow:0 6px 0 rgba(0,0,0,.45), 0 0 40px rgba(245,165,0,.55); animation:pop .55s ease-out; }
+  #count span {
+    font-size:clamp(64px,18vw,148px); font-weight:900; color:#F5A500;
+    text-shadow:0 6px 0 rgba(0,0,0,.45), 0 0 40px rgba(245,165,0,.55);
+    animation:pop .55s ease-out;
+  }
   @keyframes pop { 0%{transform:scale(.2);opacity:0} 45%{transform:scale(1.18);opacity:1} 100%{transform:scale(1);opacity:1} }
 </style>
 </head>
 <body>
+
+<!-- game canvas + in-game UI -->
 <div id="wrap">
   <canvas id="game"></canvas>
-
   <div class="hud">
     <div class="left">
       <div id="hudName" class="sub"></div>
@@ -143,51 +216,59 @@
       <div id="dist" class="sub">0 m</div>
     </div>
   </div>
-
   <button id="pauseBtn" aria-label="Pausar">⏸</button>
   <div id="count"><span></span></div>
+</div>
 
-  <!-- START -->
-  <div class="overlay" id="start">
+<!-- START — fixed, full viewport -->
+<div class="overlay" id="start">
+  <div class="o-inner">
+    <div class="hero-emoji">🦔</div>
     <div class="brand">
       <div class="brand-logo">Máquina Solo</div>
       <div class="brand-sub">Programa Tatu Saudável</div>
     </div>
-    <div class="badge">🦔 Desafio dos Setores · 3 tentativas</div>
+    <div class="badge">Desafio dos Setores · 3 tentativas</div>
+    <p class="desc">Guie o tatu, colete <b>peças 🧩</b> e desvie das <b>distrações</b> que bloqueiam seu foco. Você tem <b>3 tentativas</b> — cada uma conta.</p>
     <div class="sep"></div>
-    <p class="desc">Guie o tatu, colete <b>peças 🧩</b> e desvie das <b>distrações</b> que bloqueiam seu foco.<br>Você tem <b>3 tentativas</b> — cada uma conta.</p>
     <div class="lbl">Seu nome</div>
     <input id="nameInput" maxlength="16" placeholder="Como te chamam?" autocomplete="off">
     <div class="lbl">Seu setor</div>
     <div class="setores" id="setoresEl"></div>
-    <p class="hint">Espaço / clique / toque para pular &nbsp;•&nbsp; Segure para subir mais &nbsp;•&nbsp; Esc para pausar</p>
     <button class="btn" id="startBtn">Começar →</button>
+    <p class="hint">Espaço / clique / toque para pular &nbsp;·&nbsp; Segure para subir mais &nbsp;·&nbsp; Esc para pausar</p>
     <div class="stat">🏢 Peças coletadas pela empresa: <b id="companyTotal">0</b></div>
   </div>
+</div>
 
-  <!-- PAUSE -->
-  <div class="overlay centered hidden" id="pause">
-    <div class="brand-logo" style="font-size:clamp(16px,3.5vw,28px);">Pausado ⏸</div>
+<!-- PAUSE -->
+<div class="overlay centered hidden" id="pause">
+  <div class="o-inner">
+    <div class="brand-logo" style="font-size:clamp(24px,4.5vw,40px);">Pausado ⏸</div>
     <p class="desc">Respire fundo. Concentração total na retomada.</p>
     <div class="rowbtns">
       <button class="btn" id="resumeBtn">Continuar →</button>
       <button class="btn ghost" id="quitBtn">Sair da sessão</button>
     </div>
   </div>
+</div>
 
-  <!-- BETWEEN ATTEMPTS -->
-  <div class="overlay centered hidden" id="between">
-    <div class="brand-logo" style="font-size:clamp(14px,3vw,24px);" id="betweenTitle">Tentativa 1 encerrada</div>
+<!-- BETWEEN ATTEMPTS -->
+<div class="overlay centered hidden" id="between">
+  <div class="o-inner">
+    <div class="brand-logo" style="font-size:clamp(20px,3.8vw,32px);" id="betweenTitle">Tentativa 1 encerrada</div>
     <div class="big-score" id="betweenScore">🧩 0</div>
     <div class="att-row" id="betweenCards"></div>
     <p class="desc" id="betweenMsg"></p>
     <button class="btn" id="nextBtn">Próxima tentativa →</button>
     <div class="stat">🏢 Total da empresa: <b id="companyTotal3">0</b></div>
   </div>
+</div>
 
-  <!-- SESSION OVER -->
-  <div class="overlay centered hidden" id="over">
-    <div class="brand-logo" style="font-size:clamp(14px,3vw,24px);" id="overTitle">Sessão encerrada!</div>
+<!-- SESSION OVER -->
+<div class="overlay centered hidden" id="over">
+  <div class="o-inner">
+    <div class="brand-logo" style="font-size:clamp(20px,3.8vw,32px);" id="overTitle">Sessão encerrada!</div>
     <div class="att-row" id="overCards"></div>
     <div class="big-score" id="finalScore">🧩 0</div>
     <div class="tier-pill" id="tierPill"></div>
@@ -318,10 +399,7 @@ function jump(){
   if(tatu.onGround){ tatu.vy=-12.5; tatu.onGround=false; holdJump=1; jumpHeld=true; sfx.jump(); }
 }
 function endJump(){ jumpHeld=false; }
-cv.parentElement.addEventListener('pointerdown', e=>{
-  if(e.target.closest('button,input,.overlay,.setor')) return;
-  jump();
-});
+cv.addEventListener('pointerdown', ()=>jump());
 window.addEventListener('pointerup', endJump);
 window.addEventListener('keydown', e=>{
   if(e.code==='Space'){ e.preventDefault(); jump(); }
@@ -627,7 +705,6 @@ function showOver(){
   const best=Math.max(...sessionAttempts);
   const t=tierMsg(best);
 
-  // save sector total
   addSectorTotal(player.setor.id, best);
 
   document.getElementById('overTitle').textContent='Parabéns, '+player.name+'!';
@@ -636,7 +713,6 @@ function showOver(){
   document.getElementById('overMsg').textContent=t.msg;
   buildCards('overCards', false);
 
-  // top-5 individual scores
   const scores=getTopScores();
   scores.push({name:player.name, score:best, setor:player.setor.name});
   scores.sort((a,b)=>b.score-a.score);
