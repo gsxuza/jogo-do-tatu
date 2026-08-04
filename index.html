@@ -11,27 +11,19 @@
   #wrap { position:relative; width:100%; max-width:900px; aspect-ratio:16/9; max-height:100vh; }
   canvas { display:block; width:100%; height:100%; }
 
-  /* ── overlay base ── */
   .overlay {
     position:absolute; inset:0; display:flex; flex-direction:column;
     align-items:center; justify-content:flex-start; text-align:center;
     background:rgba(10,18,32,.94); color:#fff;
     padding:clamp(10px,1.8vw,20px) clamp(14px,3vw,32px);
-    gap:clamp(7px,1.3vw,13px); overflow-y:auto;
+    gap:clamp(6px,1.2vw,12px); overflow-y:auto;
   }
   .overlay.hidden { display:none; }
   .overlay.centered { justify-content:center; }
 
-  /* ── brand ── */
   .brand { display:flex; flex-direction:column; align-items:center; gap:1px; }
-  .brand-logo {
-    font-size:clamp(20px,5vw,40px); font-weight:900; letter-spacing:3px;
-    color:#F5A500; text-transform:uppercase; line-height:1;
-  }
-  .brand-sub {
-    font-size:clamp(9px,1.7vw,12px); font-weight:700; letter-spacing:2px;
-    color:rgba(255,255,255,.5); text-transform:uppercase;
-  }
+  .brand-logo { font-size:clamp(20px,5vw,40px); font-weight:900; letter-spacing:3px; color:#F5A500; text-transform:uppercase; line-height:1; }
+  .brand-sub  { font-size:clamp(9px,1.7vw,12px); font-weight:700; letter-spacing:2px; color:rgba(255,255,255,.5); text-transform:uppercase; }
   .badge {
     display:inline-flex; align-items:center; gap:5px;
     background:rgba(245,165,0,.12); border:1px solid rgba(245,165,0,.3);
@@ -40,12 +32,10 @@
   }
   .sep { width:100%; height:1px; background:rgba(255,255,255,.09); flex-shrink:0; }
 
-  /* ── text ── */
   .desc { font-size:clamp(12px,2.1vw,15px); max-width:460px; line-height:1.5; opacity:.85; }
   .lbl  { font-size:clamp(10px,1.7vw,12px); font-weight:700; letter-spacing:.8px; text-transform:uppercase; opacity:.6; }
   .hint { font-size:clamp(10px,1.7vw,12px); opacity:.5; line-height:1.5; }
 
-  /* ── name input ── */
   #nameInput {
     width:100%; max-width:280px; padding:9px 18px; border-radius:30px;
     border:2px solid rgba(255,255,255,.12); background:rgba(255,255,255,.07);
@@ -55,17 +45,16 @@
   #nameInput::placeholder { color:rgba(255,255,255,.3); }
   #nameInput:focus { border-color:#F5A500; }
 
-  /* ── valor chips ── */
-  .valores { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; max-width:480px; }
-  .valor {
+  /* setor chips */
+  .setores { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; max-width:480px; }
+  .setor {
     padding:5px 12px; border-radius:22px; font-size:clamp(10px,1.8vw,12px);
     font-weight:800; cursor:pointer; color:#fff; border:2px solid transparent;
     opacity:.5; transition:opacity .12s, transform .06s;
   }
-  .valor:active { transform:scale(.94); }
-  .valor.sel { opacity:1; border-color:rgba(255,255,255,.75); }
+  .setor:active { transform:scale(.94); }
+  .setor.sel { opacity:1; border-color:rgba(255,255,255,.75); }
 
-  /* ── buttons ── */
   .btn {
     background:#F5A500; color:#0d1520; border:none;
     padding:clamp(10px,1.8vw,13px) clamp(26px,4.5vw,38px);
@@ -74,50 +63,48 @@
     transition:transform .05s; letter-spacing:.4px;
   }
   .btn:active { transform:translateY(3px); box-shadow:0 2px 0 #b87800; }
-  .btn.ghost {
-    background:transparent; color:#fff;
-    box-shadow:0 0 0 2px rgba(255,255,255,.25) inset; padding:10px 24px;
-  }
+  .btn.ghost { background:transparent; color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,.25) inset; padding:10px 24px; }
   .btn.ghost:active { box-shadow:0 0 0 2px rgba(255,255,255,.15) inset; }
   .btn.share { background:#25d366; color:#0a2918; box-shadow:0 5px 0 #128c42; }
   .btn.share:active { box-shadow:0 2px 0 #128c42; }
   .rowbtns { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
 
-  /* ── stat ── */
   .stat { font-size:clamp(10px,1.8vw,13px); opacity:.65; }
   .stat b { color:#F5A500; opacity:1; }
 
-  /* ── attempt cards ── */
   .att-row { display:flex; gap:7px; justify-content:center; width:100%; max-width:360px; }
-  .att-card {
-    flex:1; min-width:70px; padding:7px 8px; border-radius:10px;
-    background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.09);
-  }
+  .att-card { flex:1; min-width:70px; padding:7px 8px; border-radius:10px; background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.09); }
   .att-card .att-label { font-size:clamp(9px,1.5vw,10px); font-weight:700; text-transform:uppercase; opacity:.5; margin-bottom:2px; }
   .att-card .att-val   { font-size:clamp(15px,2.8vw,20px); font-weight:900; color:#F5A500; }
   .att-card .att-val.empty { color:rgba(255,255,255,.18); }
   .att-card.best    { border-color:#F5A500; background:rgba(245,165,0,.1); }
   .att-card.current { border-color:rgba(255,255,255,.3); }
 
-  /* ── big score ── */
   .big-score { font-size:clamp(26px,5.5vw,44px); font-weight:900; color:#F5A500; line-height:1; }
-  .tier-pill {
-    display:inline-block; background:rgba(245,165,0,.15);
-    border:1px solid rgba(245,165,0,.3); color:#F5A500;
-    padding:4px 16px; border-radius:20px;
-    font-size:clamp(12px,2.2vw,15px); font-weight:800;
-  }
+  .tier-pill { display:inline-block; background:rgba(245,165,0,.15); border:1px solid rgba(245,165,0,.3); color:#F5A500; padding:4px 16px; border-radius:20px; font-size:clamp(12px,2.2vw,15px); font-weight:800; }
 
-  /* ── top-5 ── */
-  .scores { list-style:none; width:100%; max-width:280px; padding:0; }
-  .scores li {
-    display:flex; justify-content:space-between; padding:4px 12px; border-radius:7px;
-    font-size:clamp(11px,1.9vw,13px); font-weight:700;
-  }
+  /* two-column layout for rankings */
+  .rankings { display:flex; gap:10px; width:100%; max-width:480px; align-items:flex-start; }
+  .rank-col  { flex:1; text-align:left; }
+  .rank-title { font-size:clamp(9px,1.6vw,11px); font-weight:700; text-transform:uppercase; opacity:.55; margin-bottom:4px; letter-spacing:.5px; }
+
+  /* top-5 jogadores */
+  .scores { list-style:none; padding:0; }
+  .scores li { display:flex; justify-content:space-between; padding:3px 8px; border-radius:6px; font-size:clamp(10px,1.8vw,12px); font-weight:700; }
   .scores li:nth-child(odd){ background:rgba(255,255,255,.05); }
   .scores li.you { background:rgba(245,165,0,.15); color:#F5A500; }
 
-  /* ── HUD ── */
+  /* sector ranking */
+  .setor-rank { list-style:none; padding:0; }
+  .setor-rank li { display:flex; align-items:center; gap:5px; padding:3px 6px; border-radius:6px; font-size:clamp(10px,1.7vw,11px); font-weight:700; }
+  .setor-rank li:nth-child(odd){ background:rgba(255,255,255,.04); }
+  .setor-rank li.mine { background:rgba(245,165,0,.12); }
+  .s-dot  { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .s-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .s-bar-wrap { width:clamp(28px,4vw,44px); height:4px; background:rgba(255,255,255,.1); border-radius:2px; overflow:hidden; flex-shrink:0; }
+  .s-bar  { height:100%; border-radius:2px; }
+  .s-val  { min-width:20px; text-align:right; opacity:.8; }
+
   .hud {
     position:absolute; top:10px; left:12px; right:12px; display:flex;
     justify-content:space-between; align-items:flex-start;
@@ -128,7 +115,6 @@
   .hud .right { align-items:flex-end; }
   .hud .sub { font-size:clamp(10px,1.8vw,13px); opacity:.8; }
 
-  /* ── pause btn ── */
   #pauseBtn {
     position:absolute; top:10px; left:50%; transform:translateX(-50%);
     width:36px; height:36px; border-radius:50%; border:1.5px solid rgba(245,165,0,.35);
@@ -137,33 +123,20 @@
   }
   #pauseBtn.show { display:flex; }
 
-  /* ── countdown ── */
-  #count {
-    position:absolute; inset:0; display:none; align-items:center; justify-content:center;
-    pointer-events:none; z-index:6; background:rgba(10,18,32,.55);
-  }
+  #count { position:absolute; inset:0; display:none; align-items:center; justify-content:center; pointer-events:none; z-index:6; background:rgba(10,18,32,.55); }
   #count.show { display:flex; }
-  #count span {
-    font-size:clamp(64px,18vw,148px); font-weight:900; color:#F5A500;
-    text-shadow:0 6px 0 rgba(0,0,0,.45), 0 0 40px rgba(245,165,0,.55);
-    animation:pop .55s ease-out;
-  }
-  @keyframes pop {
-    0%   { transform:scale(.2); opacity:0; }
-    45%  { transform:scale(1.18); opacity:1; }
-    100% { transform:scale(1); opacity:1; }
-  }
+  #count span { font-size:clamp(64px,18vw,148px); font-weight:900; color:#F5A500; text-shadow:0 6px 0 rgba(0,0,0,.45), 0 0 40px rgba(245,165,0,.55); animation:pop .55s ease-out; }
+  @keyframes pop { 0%{transform:scale(.2);opacity:0} 45%{transform:scale(1.18);opacity:1} 100%{transform:scale(1);opacity:1} }
 </style>
 </head>
 <body>
 <div id="wrap">
   <canvas id="game"></canvas>
 
-  <!-- HUD -->
   <div class="hud">
     <div class="left">
       <div id="hudName" class="sub"></div>
-      <div id="hudAtt" class="sub"></div>
+      <div id="hudAtt"  class="sub"></div>
     </div>
     <div class="right">
       <div id="score">🧩 0</div>
@@ -174,30 +147,25 @@
   <button id="pauseBtn" aria-label="Pausar">⏸</button>
   <div id="count"><span></span></div>
 
-  <!-- ── START ── -->
+  <!-- START -->
   <div class="overlay" id="start">
     <div class="brand">
       <div class="brand-logo">Máquina Solo</div>
       <div class="brand-sub">Programa Tatu Saudável</div>
     </div>
-    <div class="badge">🦔 Desafio dos Valores · 3 tentativas</div>
-
+    <div class="badge">🦔 Desafio dos Setores · 3 tentativas</div>
     <div class="sep"></div>
-
     <p class="desc">Guie o tatu, colete <b>peças 🧩</b> e desvie das <b>distrações</b> que bloqueiam seu foco.<br>Você tem <b>3 tentativas</b> — cada uma conta.</p>
-
     <div class="lbl">Seu nome</div>
     <input id="nameInput" maxlength="16" placeholder="Como te chamam?" autocomplete="off">
-
-    <div class="lbl">Qual valor te representa hoje?</div>
-    <div class="valores" id="valoresEl"></div>
-
+    <div class="lbl">Seu setor</div>
+    <div class="setores" id="setoresEl"></div>
     <p class="hint">Espaço / clique / toque para pular &nbsp;•&nbsp; Segure para subir mais &nbsp;•&nbsp; Esc para pausar</p>
     <button class="btn" id="startBtn">Começar →</button>
     <div class="stat">🏢 Peças coletadas pela empresa: <b id="companyTotal">0</b></div>
   </div>
 
-  <!-- ── PAUSE ── -->
+  <!-- PAUSE -->
   <div class="overlay centered hidden" id="pause">
     <div class="brand-logo" style="font-size:clamp(16px,3.5vw,28px);">Pausado ⏸</div>
     <p class="desc">Respire fundo. Concentração total na retomada.</p>
@@ -207,7 +175,7 @@
     </div>
   </div>
 
-  <!-- ── BETWEEN ATTEMPTS ── -->
+  <!-- BETWEEN ATTEMPTS -->
   <div class="overlay centered hidden" id="between">
     <div class="brand-logo" style="font-size:clamp(14px,3vw,24px);" id="betweenTitle">Tentativa 1 encerrada</div>
     <div class="big-score" id="betweenScore">🧩 0</div>
@@ -217,18 +185,23 @@
     <div class="stat">🏢 Total da empresa: <b id="companyTotal3">0</b></div>
   </div>
 
-  <!-- ── SESSION OVER ── -->
+  <!-- SESSION OVER -->
   <div class="overlay centered hidden" id="over">
     <div class="brand-logo" style="font-size:clamp(14px,3vw,24px);" id="overTitle">Sessão encerrada!</div>
     <div class="att-row" id="overCards"></div>
     <div class="big-score" id="finalScore">🧩 0</div>
     <div class="tier-pill" id="tierPill"></div>
     <p class="desc" id="overMsg"></p>
-    <div style="width:100%;max-width:280px;text-align:left;">
-      <div class="stat" style="margin-bottom:4px;">🏆 Top 5 da sessão</div>
-      <ol class="scores" id="topScores"></ol>
+    <div class="rankings">
+      <div class="rank-col">
+        <div class="rank-title">🏆 Top 5 jogadores</div>
+        <ol class="scores" id="topScores"></ol>
+      </div>
+      <div class="rank-col">
+        <div class="rank-title">🏢 Ranking de setores</div>
+        <ul class="setor-rank" id="setorRank"></ul>
+      </div>
     </div>
-    <div class="stat">🏢 Total da empresa: <b id="companyTotal2">0</b></div>
     <div class="rowbtns">
       <button class="btn" id="retryBtn">Nova sessão →</button>
       <button class="btn share" id="shareBtn">Compartilhar 💬</button>
@@ -250,45 +223,51 @@ function resize(){
 window.addEventListener('resize', resize);
 
 /* ── persistence ── */
-const LS = { total:'tatu_totalPieces', scores:'tatu_topScores', name:'tatu_name', valor:'tatu_valor' };
+const LS = { total:'tatu_totalPieces', scores:'tatu_topScores', name:'tatu_name', setor:'tatu_setor', sectorTotals:'tatu_sectorTotals' };
 function getTotal(){ return parseInt(localStorage.getItem(LS.total)||'0',10)||0; }
 function addTotal(n){ localStorage.setItem(LS.total, String(getTotal()+n)); }
 function getTopScores(){ try{ return JSON.parse(localStorage.getItem(LS.scores)||'[]'); }catch(e){ return []; } }
 function saveTopScores(a){ localStorage.setItem(LS.scores, JSON.stringify(a.slice(0,5))); }
+function getSectorTotals(){ try{ return JSON.parse(localStorage.getItem(LS.sectorTotals)||'{}'); }catch(e){ return {}; } }
+function addSectorTotal(sectorId, n){
+  const t = getSectorTotals();
+  t[sectorId] = (t[sectorId]||0) + n;
+  localStorage.setItem(LS.sectorTotals, JSON.stringify(t));
+}
 function refreshTotals(){
-  ['companyTotal','companyTotal2','companyTotal3'].forEach(id=>{
+  ['companyTotal','companyTotal3'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.textContent=getTotal().toLocaleString('pt-BR');
   });
 }
 
-/* ── 8 valores da Máquina Solo ── */
-const VALORES = [
-  { id:'comecar',      name:'Começar Bem',  color:'#16a34a' },
-  { id:'generosidade', name:'Generosidade', color:'#7c3aed' },
-  { id:'disciplina',   name:'Disciplina',   color:'#2563eb' },
-  { id:'paciencia',    name:'Paciência',    color:'#0891b2' },
-  { id:'persistencia', name:'Persistência', color:'#ea580c' },
-  { id:'concentracao', name:'Concentração', color:'#dc2626' },
-  { id:'sabedoria',    name:'Sabedoria',    color:'#ca8a04' },
-  { id:'encerrar',     name:'Encerrar Bem', color:'#db2777' }
+/* ── 8 setores ── */
+const SETORES = [
+  { id:'comercial',  name:'Comercial',      color:'#2563eb' },
+  { id:'operacoes',  name:'Operações',       color:'#ea580c' },
+  { id:'financeiro', name:'Financeiro',      color:'#16a34a' },
+  { id:'rh',         name:'RH & Pessoas',    color:'#7c3aed' },
+  { id:'logistica',  name:'Logística',       color:'#0891b2' },
+  { id:'manutencao', name:'Manutenção',      color:'#dc2626' },
+  { id:'ti',         name:'TI',              color:'#ca8a04' },
+  { id:'adm',        name:'Administrativo',  color:'#db2777' }
 ];
-let player = { name:'Tatu', valor:VALORES[5] };
+let player = { name:'Tatu', setor:SETORES[0] };
 
-const valoresEl = document.getElementById('valoresEl');
-VALORES.forEach(v=>{
+const setoresEl = document.getElementById('setoresEl');
+SETORES.forEach(s=>{
   const b = document.createElement('div');
-  b.className='valor'; b.textContent=v.name; b.style.background=v.color;
-  b.dataset.id=v.id; b.onclick=()=>selectValor(v.id);
-  valoresEl.appendChild(b);
+  b.className='setor'; b.textContent=s.name; b.style.background=s.color;
+  b.dataset.id=s.id; b.onclick=()=>selectSetor(s.id);
+  setoresEl.appendChild(b);
 });
-function selectValor(id){
-  player.valor = VALORES.find(v=>v.id===id) || VALORES[5];
-  localStorage.setItem(LS.valor, player.valor.id);
-  [...valoresEl.children].forEach(c=>c.classList.toggle('sel', c.dataset.id===id));
+function selectSetor(id){
+  player.setor = SETORES.find(s=>s.id===id) || SETORES[0];
+  localStorage.setItem(LS.setor, player.setor.id);
+  [...setoresEl.children].forEach(c=>c.classList.toggle('sel', c.dataset.id===id));
 }
 const nameInput = document.getElementById('nameInput');
 nameInput.value = localStorage.getItem(LS.name) || '';
-selectValor(localStorage.getItem(LS.valor) || 'concentracao');
+selectSetor(localStorage.getItem(LS.setor) || 'comercial');
 refreshTotals();
 
 /* ── session ── */
@@ -328,7 +307,6 @@ function reset(){
   obstacles=[]; pieces=[]; clouds=[]; hills=[]; particles=[];
   for(let i=0;i<4;i++) clouds.push({x:Math.random()*W, y:18+Math.random()*H*0.26, s:0.26+Math.random()*0.42, r:15+Math.random()*20});
   for(let i=0;i<5;i++) hills.push({x:i*240, r:100+Math.random()*80});
-  // harder difficulty — target ~20 pieces = good score
   speed=5.8; dist=0; score=0; spawnT=46; pieceT=40;
   holdJump=0; jumpHeld=false;
   updateHud();
@@ -341,7 +319,7 @@ function jump(){
 }
 function endJump(){ jumpHeld=false; }
 cv.parentElement.addEventListener('pointerdown', e=>{
-  if(e.target.closest('button,input,.overlay,.valor')) return;
+  if(e.target.closest('button,input,.overlay,.setor')) return;
   jump();
 });
 window.addEventListener('pointerup', endJump);
@@ -404,13 +382,11 @@ function hideAll(){
   document.getElementById('count').classList.remove('show');
 }
 
-/* ── HUD ── */
 function updateHud(){
   const n = sessionAttempts.length + 1;
-  document.getElementById('hudAtt').textContent = `Tentativa ${n}/${MAX_ATTEMPTS}`;
+  document.getElementById('hudAtt').textContent = 'Tentativa '+n+'/'+MAX_ATTEMPTS;
 }
 
-/* ── particles ── */
 function burst(x,y,color){
   for(let i=0;i<10;i++){
     const a=Math.random()*Math.PI*2, sp=1.4+Math.random()*3;
@@ -422,13 +398,13 @@ function burst(x,y,color){
 function drawTatu(t){
   ctx.save(); ctx.translate(t.x,t.y);
   ctx.fillStyle='#8a6a4f';
-  ctx.strokeStyle=player.valor.color; ctx.lineWidth=3.5;
+  ctx.strokeStyle=player.setor.color; ctx.lineWidth=3.5;
   ctx.beginPath(); ctx.ellipse(0,-t.h*.45,t.w*.5,t.h*.5,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
   ctx.strokeStyle='#6f503a'; ctx.lineWidth=1.5;
   for(let i=-2;i<=2;i++){
     ctx.beginPath(); ctx.moveTo(i*8,-t.h*.9); ctx.lineTo(i*8,0); ctx.stroke();
   }
-  ctx.fillStyle='#a3805f'; ctx.strokeStyle=player.valor.color; ctx.lineWidth=2;
+  ctx.fillStyle='#a3805f'; ctx.strokeStyle=player.setor.color; ctx.lineWidth=2;
   ctx.beginPath(); ctx.ellipse(t.w*.42,-t.h*.35,10,8,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
   ctx.fillStyle='#1a1a1a';
   ctx.beginPath(); ctx.arc(t.w*.44,-t.h*.45,2,0,Math.PI*2); ctx.fill();
@@ -593,10 +569,10 @@ function hitObstacle(){
 
 /* ── tier message ── */
 function tierMsg(s){
-  if(s<=7)  return { label:'Bora aquecer! 💪', msg:'Persistência e Disciplina te levam mais longe. Concentração total na próxima tentativa!' };
-  if(s<=15) return { label:'Pegando o ritmo! 🎯', msg:'Sua Concentração já aparece! Com Paciência e Persistência você vai muito além.' };
-  if(s<=30) return { label:'Muito bem! 🔥', msg:'Disciplina afiada e Concentração em dia. A Sabedoria já guia seus passos — continue!' };
-  return      { label:'Foco de mestre! 🏆', msg:'Todos os valores em ação: Concentração, Persistência, Sabedoria. Você encerrou muito bem!' };
+  if(s<=7)  return { label:'Bora aquecer! 💪', msg:'Concentração e Disciplina te levam mais longe. Força total na próxima tentativa!' };
+  if(s<=15) return { label:'Pegando o ritmo! 🎯', msg:'Já aparece o foco! Com constância você vai muito além.' };
+  if(s<=30) return { label:'Muito bem! 🔥', msg:'Ótimo desempenho! Seu setor vai se orgulhar desse resultado.' };
+  return      { label:'Foco de mestre! 🏆', msg:'Resultado incrível! Você levou seu setor ao topo do ranking.' };
 }
 
 /* ── attempt cards ── */
@@ -609,32 +585,60 @@ function buildCards(containerId, highlightCurrent){
     const isBest=!highlightCurrent && s!==undefined && s===best && sessionAttempts.filter(x=>x===best).length===1;
     const card=document.createElement('div');
     card.className='att-card'+(isBest?' best':isCurrent?' current':'');
-    card.innerHTML=`<div class="att-label">Tentativa ${i+1}</div>
-      <div class="att-val${s===undefined?' empty':''}">${s!==undefined?'🧩 '+s:'—'}</div>`;
+    const val=s!==undefined?'🧩 '+s:'—';
+    card.innerHTML='<div class="att-label">Tentativa '+(i+1)+'</div><div class="att-val'+(s===undefined?' empty':'')+'">'+val+'</div>';
     el.appendChild(card);
   }
 }
 
 function showBetween(){
   const att=sessionAttempts.length, s=sessionAttempts[att-1];
-  document.getElementById('betweenTitle').textContent=`Tentativa ${att} encerrada`;
-  document.getElementById('betweenScore').textContent=`🧩 ${s} peça${s!==1?'s':''}`;
+  document.getElementById('betweenTitle').textContent='Tentativa '+att+' encerrada';
+  document.getElementById('betweenScore').textContent='🧩 '+s+' peça'+(s!==1?'s':'');
   document.getElementById('betweenMsg').textContent=tierMsg(s).msg;
   buildCards('betweenCards', true);
   document.getElementById('between').classList.remove('hidden');
 }
 
+/* ── sector ranking ── */
+function renderSectorRanking(){
+  const totals = getSectorTotals();
+  const sorted = SETORES
+    .map(s=>({ ...s, total: totals[s.id]||0 }))
+    .sort((a,b)=>b.total-a.total);
+  const max = sorted[0].total || 1;
+  const ul = document.getElementById('setorRank');
+  ul.innerHTML='';
+  sorted.forEach(s=>{
+    const li=document.createElement('li');
+    const isMine = s.id===player.setor.id;
+    if(isMine) li.classList.add('mine');
+    const pct=Math.round(s.total/max*100);
+    li.innerHTML=
+      '<span class="s-dot" style="background:'+s.color+'"></span>'+
+      '<span class="s-name" style="color:'+(isMine?'#F5A500':'inherit')+'">'+esc(s.name)+'</span>'+
+      '<span class="s-bar-wrap"><span class="s-bar" style="width:'+pct+'%;background:'+s.color+'"></span></span>'+
+      '<span class="s-val">'+s.total+'</span>';
+    ul.appendChild(li);
+  });
+}
+
 function showOver(){
   const best=Math.max(...sessionAttempts);
   const t=tierMsg(best);
-  document.getElementById('overTitle').textContent=`Parabéns, ${player.name}!`;
-  document.getElementById('finalScore').textContent=`🧩 Melhor: ${best} peça${best!==1?'s':''}`;
+
+  // save sector total
+  addSectorTotal(player.setor.id, best);
+
+  document.getElementById('overTitle').textContent='Parabéns, '+player.name+'!';
+  document.getElementById('finalScore').textContent='🧩 Melhor: '+best+' peça'+(best!==1?'s':'');
   document.getElementById('tierPill').textContent=t.label;
   document.getElementById('overMsg').textContent=t.msg;
   buildCards('overCards', false);
 
+  // top-5 individual scores
   const scores=getTopScores();
-  scores.push({name:player.name, score:best, valor:player.valor.name});
+  scores.push({name:player.name, score:best, setor:player.setor.name});
   scores.sort((a,b)=>b.score-a.score);
   const top=scores.slice(0,5);
   saveTopScores(top);
@@ -644,9 +648,11 @@ function showOver(){
     const li=document.createElement('li');
     const isYou=!marked && e.name===player.name && e.score===best;
     if(isYou){ li.classList.add('you'); marked=true; }
-    li.innerHTML=`<span>${esc(e.name)}</span><span>🧩 ${e.score}</span>`;
+    li.innerHTML='<span>'+esc(e.name)+'</span><span>🧩 '+e.score+'</span>';
     ol.appendChild(li);
   });
+
+  renderSectorRanking();
   refreshTotals();
   document.getElementById('over').classList.remove('hidden');
   state='over';
@@ -659,7 +665,7 @@ function esc(s){
 /* ── share ── */
 function shareResult(){
   const best=Math.max(...sessionAttempts);
-  const text=`🧩 Coletei ${best} peças no Tatu Saudável da Máquina Solo! Bora superar? [${player.valor.name}]`;
+  const text='🧩 Coletei '+best+' peças no Tatu Saudável da Máquina Solo! Bora superar? ['+player.setor.name+']';
   if(navigator.share){ navigator.share({text}).catch(()=>{}); }
   else if(navigator.clipboard){
     navigator.clipboard.writeText(text).then(()=>{
