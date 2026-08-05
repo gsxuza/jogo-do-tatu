@@ -76,10 +76,9 @@
 
   /* ── sector chips — 4-col grid, 2-col on narrow ── */
   .setores {
-    display:grid; grid-template-columns:repeat(4,1fr);
+    display:grid; grid-template-columns:repeat(3,1fr);
     gap:8px; width:100%;
   }
-  @media(max-width:480px){ .setores { grid-template-columns:repeat(2,1fr); } }
   .setor {
     padding:11px 6px; border-radius:10px;
     font-size:clamp(11px,1.9vw,13px); font-weight:800;
@@ -323,14 +322,15 @@ function refreshTotals(){
 
 /* ── 8 setores ── */
 const SETORES = [
-  { id:'comercial',  name:'Comercial',      color:'#2563eb' },
-  { id:'operacoes',  name:'Operações',       color:'#ea580c' },
+  { id:'diretoria',  name:'Diretoria',       color:'#a16207' },
+  { id:'comercial',  name:'Comercial',       color:'#2563eb' },
+  { id:'operacional',name:'Operacional',     color:'#ea580c' },
   { id:'financeiro', name:'Financeiro',      color:'#16a34a' },
-  { id:'rh',         name:'RH & Pessoas',    color:'#7c3aed' },
+  { id:'rh',         name:'RH & Pessoas',   color:'#7c3aed' },
   { id:'logistica',  name:'Logística',       color:'#0891b2' },
-  { id:'manutencao', name:'Manutenção',      color:'#dc2626' },
+  { id:'suprimentos',name:'Suprimentos',     color:'#dc2626' },
   { id:'ti',         name:'TI',              color:'#ca8a04' },
-  { id:'adm',        name:'Administrativo',  color:'#db2777' }
+  { id:'posvendas',  name:'Pós Vendas',      color:'#db2777' }
 ];
 let player = { name:'Tatu', setor:SETORES[0] };
 
@@ -348,7 +348,7 @@ function selectSetor(id){
 }
 const nameInput = document.getElementById('nameInput');
 nameInput.value = localStorage.getItem(LS.name) || '';
-selectSetor(localStorage.getItem(LS.setor) || 'comercial');
+selectSetor(localStorage.getItem(LS.setor) || 'diretoria');
 refreshTotals();
 
 /* ── session ── */
