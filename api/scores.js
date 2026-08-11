@@ -84,9 +84,15 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method === 'DELETE') {
+    if (req.query && req.query.ratelimit === '1') {
+      // Clear only rate limits, keep scores intact
+      mem.rateLimit = {};
+      await saveStore();
+      return res.status(200).json({ ok: true, cleared: 'ratelimit', players: mem.players.length });
+    }
     mem = { players: [], companyTotal: 0, rateLimit: {} };
     await saveStore();
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, cleared: 'all' });
   }
 
   return res.status(405).end();
