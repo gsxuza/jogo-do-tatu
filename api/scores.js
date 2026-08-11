@@ -57,18 +57,25 @@ module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     const qs = new URL(req.url, 'http://localhost').searchParams;
     if (qs.get('debug') === '1') {
-      let redisOk = false, redisError = null;
+      let redisOk = false, redisError = null, redisRaw = null, redisStatus = null;
       try {
-        await redisCmd('SET', 'tatu:ping', 'pong');
-        const pong = await redisCmd('GET', 'tatu:ping');
-        redisOk = pong === 'pong';
+        const r = await fetch(REDIS_URL, {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' },
+          body: JSON.stringify(['SET', 'tatu:ping', 'pong'])
+        });
+        redisStatus = r.status;
+        redisRaw = await r.json();
+        redisOk = redisRaw && redisRaw.result === 'OK';
       } catch(e) { redisError = String(e); }
       return res.status(200).json({
         redisConfigured: !!REDIS_URL,
+        redisUrlPrefix: REDIS_URL ? REDIS_URL.slice(0, 35) + '…' : null,
+        redisStatus,
+        redisRaw,
         redisOk,
         redisError,
-        players: mem.players.length,
-        ...buildPayload()
+        players: mem.players.length
       });
     }
     return res.status(200).json(buildPayload());
