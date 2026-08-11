@@ -240,6 +240,7 @@
     <div class="setores" id="setoresEl"></div>
     <div id="rateLimitNotice" class="rate-notice" style="display:none"></div>
     <button class="btn" id="startBtn">Começar →</button>
+    <button class="btn ghost" id="demoBtn">Experimentar antes 🎮</button>
     <p class="hint">Espaço / clique / toque para pular &nbsp;·&nbsp; Segure para subir mais &nbsp;·&nbsp; Esc para pausar</p>
     <div class="stat">🏢 Peças coletadas pela empresa: <b id="companyTotal">—</b></div>
     <div class="sep"></div>
@@ -338,16 +339,18 @@ async function postScore(name, setor, setorId, score) {
 const LS = { name:'tatu_name', setor:'tatu_setor' };
 ['tatu_totalPieces','tatu_topScores','tatu_sectorTotals'].forEach(k => localStorage.removeItem(k));
 
-/* ── trava semanal ── */
+/* ── trava semanal (chave = nome + setor) ── */
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 function getPlayedTimes(){ try{ return JSON.parse(localStorage.getItem('tatu_played')||'{}'); }catch(e){ return {}; } }
-function isRateLimited(id){ const t=getPlayedTimes()[id]; return !!(t&&(Date.now()-t)<WEEK_MS); }
-function timeLeft(id){ const t=getPlayedTimes()[id]; return t?Math.max(0,t+WEEK_MS-Date.now()):0; }
+function playedKey(name,id){ return (name||'').toLowerCase().trim()+':'+id; }
+function isRateLimited(name,id){ const t=getPlayedTimes()[playedKey(name,id)]; return !!(t&&(Date.now()-t)<WEEK_MS); }
+function timeLeft(name,id){ const t=getPlayedTimes()[playedKey(name,id)]; return t?Math.max(0,t+WEEK_MS-Date.now()):0; }
 function fmtTime(ms){ const d=Math.floor(ms/86400000),h=Math.floor(ms%86400000/3600000),m=Math.floor(ms%3600000/60000); return d?d+'d '+h+'h':h?h+'h '+m+'min':Math.max(1,m)+'min'; }
 function updateRateLimitUI(){
-  const lim=isRateLimited(player.setor.id);
+  const nm=(nameInput.value||'').trim();
+  const lim=nm && isRateLimited(nm, player.setor.id);
   const n=document.getElementById('rateLimitNotice'), b=document.getElementById('startBtn');
-  if(lim){ n.textContent='⏳ Você já jogou neste setor esta semana. Próxima tentativa em '+fmtTime(timeLeft(player.setor.id))+'.'; n.style.display=''; b.classList.add('disabled'); }
+  if(lim){ n.textContent='⏳ '+nm+' já jogou neste setor esta semana. Próxima tentativa em '+fmtTime(timeLeft(nm, player.setor.id))+'.'; n.style.display=''; b.classList.add('disabled'); }
   else{ n.style.display='none'; b.classList.remove('disabled'); }
 }
 
@@ -379,6 +382,7 @@ function selectSetor(id){
 }
 const nameInput = document.getElementById('nameInput');
 nameInput.value = localStorage.getItem(LS.name) || '';
+nameInput.addEventListener('input', updateRateLimitUI);
 selectSetor(localStorage.getItem(LS.setor) || 'comercial');
 
 /* ── renderiza placar global ── */
@@ -427,6 +431,7 @@ fetchScores().then(data => { if (data) renderBoard(data, 'startTopScores', 'star
 
 /* ── sessão ── */
 let sessionAttempts = [];
+let demoMode = false;
 const MAX_ATTEMPTS = 3;
 
 /* ── áudio ── */
@@ -481,7 +486,8 @@ window.addEventListener('keydown', e=>{
 window.addEventListener('keyup', e=>{ if(e.code==='Space') endJump(); });
 
 document.getElementById('startBtn').onclick  = startSession;
-document.getElementById('retryBtn').onclick  = startSession;
+document.getElementById('retryBtn').onclick  = quitToStart;
+document.getElementById('demoBtn').onclick   = startDemo;
 document.getElementById('nextBtn').onclick   = nextAttempt;
 document.getElementById('pauseBtn').onclick  = togglePause;
 document.getElementById('resumeBtn').onclick = togglePause;
@@ -490,14 +496,25 @@ document.getElementById('shareBtn').onclick  = shareResult;
 
 function startSession(){
   ac();
-  if(isRateLimited(player.setor.id)){ updateRateLimitUI(); return; }
-  player.name = (nameInput.value||'').trim().slice(0,16) || 'Tatu';
+  const nm=(nameInput.value||'').trim().slice(0,16)||'Tatu';
+  if(isRateLimited(nm, player.setor.id)){ updateRateLimitUI(); return; }
+  demoMode = false;
+  player.name = nm;
   localStorage.setItem(LS.name, nameInput.value.trim());
-  const played=getPlayedTimes(); played[player.setor.id]=Date.now();
+  const played=getPlayedTimes(); played[playedKey(player.name, player.setor.id)]=Date.now();
   localStorage.setItem('tatu_played',JSON.stringify(played));
   sessionAttempts = [];
   hideAll(); resize(); reset();
   document.getElementById('hudName').textContent = '👤 '+player.name;
+  startCountdown();
+}
+function startDemo(){
+  ac();
+  demoMode = true;
+  player.name = (nameInput.value||'').trim().slice(0,16) || 'Tatu';
+  sessionAttempts = [];
+  hideAll(); resize(); reset();
+  document.getElementById('hudName').textContent = '🎮 Demo';
   startCountdown();
 }
 function nextAttempt(){ hideAll(); resize(); reset(); startCountdown(); }
@@ -537,7 +554,7 @@ function hideAll(){
 }
 function updateHud(){
   const n = sessionAttempts.length + 1;
-  document.getElementById('hudAtt').textContent = 'Tentativa '+n+'/'+MAX_ATTEMPTS;
+  document.getElementById('hudAtt').textContent = demoMode ? '🎮 Demo' : 'Tentativa '+n+'/'+MAX_ATTEMPTS;
 }
 function burst(x,y,color){
   for(let i=0;i<10;i++){
@@ -711,7 +728,8 @@ function hitObstacle(){
   state='between';
   document.getElementById('pauseBtn').classList.remove('show');
   sessionAttempts.push(score);
-  if(sessionAttempts.length < MAX_ATTEMPTS) showBetween();
+  const maxAtts = demoMode ? 1 : MAX_ATTEMPTS;
+  if(sessionAttempts.length < maxAtts) showBetween();
   else { sfx.over(); showOver(); }
 }
 
@@ -725,7 +743,8 @@ function tierMsg(s){
 function buildCards(containerId, highlightCurrent){
   const el=document.getElementById(containerId); el.innerHTML='';
   const best=sessionAttempts.length?Math.max(...sessionAttempts):null;
-  for(let i=0;i<MAX_ATTEMPTS;i++){
+  const maxAtts = demoMode ? 1 : MAX_ATTEMPTS;
+  for(let i=0;i<maxAtts;i++){
     const s=sessionAttempts[i];
     const isCurrent=highlightCurrent && i===sessionAttempts.length-1;
     const isBest=!highlightCurrent && s!==undefined && s===best && sessionAttempts.filter(x=>x===best).length===1;
@@ -749,17 +768,25 @@ function showBetween(){
 function showOver(){
   const best=Math.max(...sessionAttempts);
   const t=tierMsg(best);
-  document.getElementById('overTitle').textContent='Parabéns, '+player.name+'!';
-  document.getElementById('finalScore').textContent='🧩 Melhor: '+best+' peça'+(best!==1?'s':'');
+  document.getElementById('overTitle').textContent = demoMode ? '🎮 Demonstração concluída!' : 'Parabéns, '+player.name+'!';
+  document.getElementById('finalScore').textContent='🧩 '+best+' peça'+(best!==1?'s':'');
   document.getElementById('tierPill').textContent=t.label;
-  document.getElementById('overMsg').textContent=t.msg;
+  document.getElementById('overMsg').textContent = demoMode
+    ? 'Gostou? Clique em "Jogar de verdade" para entrar no ranking do seu setor!'
+    : t.msg;
   buildCards('overCards', false);
   document.getElementById('globalRankBadge').style.display='none';
-  document.getElementById('topScores').innerHTML='<li style="opacity:.35;font-size:10px;padding:4px 8px">Salvando…</li>';
+  document.getElementById('retryBtn').textContent = demoMode ? 'Jogar de verdade →' : 'Nova sessão →';
   document.getElementById('setorRank').innerHTML='';
   document.getElementById('over').classList.remove('hidden');
   state='over';
 
+  if(demoMode){
+    document.getElementById('topScores').innerHTML='<li style="opacity:.35;font-size:10px;padding:4px 8px">Partida de demonstração — placar não registrado.</li>';
+    return;
+  }
+
+  document.getElementById('topScores').innerHTML='<li style="opacity:.35;font-size:10px;padding:4px 8px">Salvando…</li>';
   postScore(player.name, player.setor.name, player.setor.id, best).then(data => {
     if (!data) return;
     if (data.rateLimited) {
