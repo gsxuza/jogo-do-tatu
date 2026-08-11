@@ -1,4 +1,6 @@
-let store = { players: [], companyTotal: 0 };
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+let store = { players: [], companyTotal: 0, rateLimit: {} };
 
 function buildPayload() {
   const sectorTotals = {};
@@ -24,7 +26,15 @@ module.exports = function handler(req, res) {
     const setor   = String(b.setor   || '');
     const setorId = String(b.setorId || '');
     const score   = Math.max(0, parseInt(b.score, 10) || 0);
-    const entry   = { name, setor, setorId, score, ts: Date.now() };
+
+    const key = name.toLowerCase().trim() + ':' + setorId;
+    const lastPlay = store.rateLimit[key];
+    if (lastPlay && (Date.now() - lastPlay) < WEEK_MS) {
+      return res.status(200).json({ ...buildPayload(), rateLimited: true, nextAllowed: lastPlay + WEEK_MS });
+    }
+
+    store.rateLimit[key] = Date.now();
+    const entry = { name, setor, setorId, score, ts: Date.now() };
     store.companyTotal += score;
     store.players.push(entry);
     store.players.sort((a, b) => b.score - a.score);
@@ -34,7 +44,7 @@ module.exports = function handler(req, res) {
   }
 
   if (req.method === 'DELETE') {
-    store = { players: [], companyTotal: 0 };
+    store = { players: [], companyTotal: 0, rateLimit: {} };
     return res.status(200).json({ ok: true });
   }
 
