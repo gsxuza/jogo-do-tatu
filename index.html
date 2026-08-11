@@ -11,7 +11,6 @@
   #wrap { position:fixed; inset:0; }
   canvas { display:block; width:100%; height:100%; }
 
-  /* ── full-viewport overlays ── */
   .overlay {
     position:fixed; inset:0; z-index:100;
     display:flex; flex-direction:column;
@@ -32,7 +31,6 @@
     text-align:center;
   }
 
-  /* ── brand hero ── */
   .hero-emoji {
     font-size:clamp(52px,10vh,84px); line-height:1;
     filter:drop-shadow(0 6px 24px rgba(245,165,0,.38));
@@ -48,7 +46,6 @@
     font-size:clamp(10px,1.8vw,13px); font-weight:700;
     letter-spacing:2.5px; color:rgba(255,255,255,.38); text-transform:uppercase;
   }
-
   .badge {
     display:inline-flex; align-items:center; gap:6px;
     background:rgba(245,165,0,.09); border:1px solid rgba(245,165,0,.25);
@@ -57,14 +54,12 @@
   }
   .sep { width:60px; height:2px; background:rgba(245,165,0,.22); border-radius:2px; flex-shrink:0; }
 
-  /* ── copy ── */
   .desc { font-size:clamp(13px,2.2vw,16px); max-width:380px; line-height:1.65; opacity:.8; }
   .lbl  { font-size:clamp(10px,1.7vw,11px); font-weight:700; letter-spacing:1.2px; text-transform:uppercase; opacity:.45; width:100%; text-align:left; }
   .hint { font-size:clamp(10px,1.6vw,12px); opacity:.38; line-height:1.6; }
   .stat { font-size:clamp(11px,1.8vw,13px); opacity:.55; }
   .stat b { color:#F5A500; opacity:1; }
 
-  /* ── name input ── */
   #nameInput {
     width:100%; padding:13px 22px; border-radius:34px;
     border:2px solid rgba(255,255,255,.1); background:rgba(255,255,255,.06);
@@ -74,11 +69,11 @@
   #nameInput::placeholder { color:rgba(255,255,255,.25); }
   #nameInput:focus { border-color:#F5A500; background:rgba(245,165,0,.07); }
 
-  /* ── sector chips — 4-col grid, 2-col on narrow ── */
   .setores {
-    display:grid; grid-template-columns:repeat(3,1fr);
+    display:grid; grid-template-columns:repeat(4,1fr);
     gap:8px; width:100%;
   }
+  @media (max-width:380px) { .setores { grid-template-columns:repeat(2,1fr); } }
   .setor {
     padding:11px 6px; border-radius:10px;
     font-size:clamp(11px,1.9vw,13px); font-weight:800;
@@ -92,7 +87,6 @@
     box-shadow:0 0 14px rgba(255,255,255,.12);
   }
 
-  /* ── buttons ── */
   .btn {
     background:#F5A500; color:#0d1520; border:none;
     padding:clamp(14px,2.4vh,18px) clamp(30px,5vw,44px);
@@ -112,7 +106,6 @@
   .btn.share:active { box-shadow:0 3px 0 #128c42; }
   .rowbtns { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; width:100%; }
 
-  /* ── scores ── */
   .big-score {
     font-size:clamp(34px,7vh,56px); font-weight:900; color:#F5A500;
     line-height:1; text-shadow:0 0 30px rgba(245,165,0,.42);
@@ -123,8 +116,13 @@
     padding:5px 20px; border-radius:24px;
     font-size:clamp(12px,2.2vw,15px); font-weight:800;
   }
+  .rank-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(245,165,0,.1); border:1px solid rgba(245,165,0,.3);
+    color:#F5A500; padding:7px 20px; border-radius:24px;
+    font-size:clamp(12px,2.2vw,14px); font-weight:800;
+  }
 
-  /* ── attempt cards ── */
   .att-row { display:flex; gap:8px; justify-content:center; width:100%; max-width:340px; }
   .att-card {
     flex:1; min-width:0; padding:10px 8px; border-radius:12px;
@@ -137,7 +135,6 @@
   .att-card.best    { border-color:#F5A500; background:rgba(245,165,0,.1); }
   .att-card.current { border-color:rgba(255,255,255,.26); }
 
-  /* ── rankings ── */
   .rankings { display:flex; gap:12px; width:100%; align-items:flex-start; }
   .rank-col  { flex:1; text-align:left; min-width:0; }
   .rank-title {
@@ -148,10 +145,11 @@
   .scores li {
     display:flex; justify-content:space-between;
     padding:4px 8px; border-radius:6px;
-    font-size:clamp(10px,1.8vw,12px); font-weight:700; gap:8px;
+    font-size:clamp(10px,1.8vw,12px); font-weight:700; gap:6px;
   }
   .scores li:nth-child(odd){ background:rgba(255,255,255,.04); }
   .scores li.you { background:rgba(245,165,0,.13); color:#F5A500; }
+  .scores li .s-sub { font-weight:500; opacity:.45; font-size:.85em; }
   .setor-rank { list-style:none; padding:0; }
   .setor-rank li {
     display:flex; align-items:center; gap:5px;
@@ -166,7 +164,6 @@
   .s-bar  { height:100%; border-radius:2px; }
   .s-val  { min-width:22px; text-align:right; opacity:.72; }
 
-  /* ── in-game HUD (inside #wrap) ── */
   .hud {
     position:absolute; top:10px; left:12px; right:12px; display:flex;
     justify-content:space-between; align-items:flex-start;
@@ -202,7 +199,6 @@
 </head>
 <body>
 
-<!-- game canvas + in-game UI -->
 <div id="wrap">
   <canvas id="game"></canvas>
   <div class="hud">
@@ -219,7 +215,7 @@
   <div id="count"><span></span></div>
 </div>
 
-<!-- START — fixed, full viewport -->
+<!-- START -->
 <div class="overlay" id="start">
   <div class="o-inner">
     <div class="hero-emoji">🦔</div>
@@ -228,7 +224,7 @@
       <div class="brand-sub">Programa Tatu Saudável</div>
     </div>
     <div class="badge">Desafio dos Setores · 3 tentativas</div>
-    <p class="desc">Guie o tatu, colete <b>peças 🧩</b> e desvie das <b>distrações</b> que bloqueiam seu foco. Você tem <b>3 tentativas</b> — cada uma conta.</p>
+    <p class="desc">Guie o tatu, colete <b>peças 🧩</b> e desvie das <b>distrações</b>. Você tem <b>3 tentativas</b> — cada uma conta.</p>
     <div class="sep"></div>
     <div class="lbl">Seu nome</div>
     <input id="nameInput" maxlength="16" placeholder="Como te chamam?" autocomplete="off">
@@ -236,7 +232,19 @@
     <div class="setores" id="setoresEl"></div>
     <button class="btn" id="startBtn">Começar →</button>
     <p class="hint">Espaço / clique / toque para pular &nbsp;·&nbsp; Segure para subir mais &nbsp;·&nbsp; Esc para pausar</p>
-    <div class="stat">🏢 Peças coletadas pela empresa: <b id="companyTotal">0</b></div>
+    <div class="stat">🏢 Peças coletadas pela empresa: <b id="companyTotal">—</b></div>
+    <div class="sep"></div>
+    <div class="lbl">Placar Global</div>
+    <div class="rankings">
+      <div class="rank-col">
+        <div class="rank-title">🏆 Top jogadores</div>
+        <ol class="scores" id="startTopScores"><li style="opacity:.35;font-size:10px;padding:4px 8px">Carregando…</li></ol>
+      </div>
+      <div class="rank-col">
+        <div class="rank-title">🏢 Setores</div>
+        <ul class="setor-rank" id="startSetorRank"><li style="opacity:.35;font-size:10px;padding:4px 6px">Carregando…</li></ul>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -260,7 +268,6 @@
     <div class="att-row" id="betweenCards"></div>
     <p class="desc" id="betweenMsg"></p>
     <button class="btn" id="nextBtn">Próxima tentativa →</button>
-    <div class="stat">🏢 Total da empresa: <b id="companyTotal3">0</b></div>
   </div>
 </div>
 
@@ -271,14 +278,15 @@
     <div class="att-row" id="overCards"></div>
     <div class="big-score" id="finalScore">🧩 0</div>
     <div class="tier-pill" id="tierPill"></div>
+    <div class="rank-badge" id="globalRankBadge" style="display:none">📍 <span id="globalRankText"></span></div>
     <p class="desc" id="overMsg"></p>
     <div class="rankings">
       <div class="rank-col">
-        <div class="rank-title">🏆 Top 5 jogadores</div>
+        <div class="rank-title">🏆 Top 10 global</div>
         <ol class="scores" id="topScores"></ol>
       </div>
       <div class="rank-col">
-        <div class="rank-title">🏢 Ranking de setores</div>
+        <div class="rank-title">🏢 Ranking setores</div>
         <ul class="setor-rank" id="setorRank"></ul>
       </div>
     </div>
@@ -302,35 +310,35 @@ function resize(){
 }
 window.addEventListener('resize', resize);
 
-/* ── persistence ── */
-const LS = { total:'tatu_totalPieces', scores:'tatu_topScores', name:'tatu_name', setor:'tatu_setor', sectorTotals:'tatu_sectorTotals' };
-function getTotal(){ return parseInt(localStorage.getItem(LS.total)||'0',10)||0; }
-function addTotal(n){ localStorage.setItem(LS.total, String(getTotal()+n)); }
-function getTopScores(){ try{ return JSON.parse(localStorage.getItem(LS.scores)||'[]'); }catch(e){ return []; } }
-function saveTopScores(a){ localStorage.setItem(LS.scores, JSON.stringify(a.slice(0,5))); }
-function getSectorTotals(){ try{ return JSON.parse(localStorage.getItem(LS.sectorTotals)||'{}'); }catch(e){ return {}; } }
-function addSectorTotal(sectorId, n){
-  const t = getSectorTotals();
-  t[sectorId] = (t[sectorId]||0) + n;
-  localStorage.setItem(LS.sectorTotals, JSON.stringify(t));
+/* ── API pública ── */
+const API = '/api/scores';
+async function fetchScores() {
+  try { const r = await fetch(API); return r.ok ? r.json() : null; } catch(e) { return null; }
 }
-function refreshTotals(){
-  ['companyTotal','companyTotal3'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.textContent=getTotal().toLocaleString('pt-BR');
-  });
+async function postScore(name, setor, setorId, score) {
+  try {
+    const r = await fetch(API, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, setor, setorId, score })
+    });
+    return r.ok ? r.json() : null;
+  } catch(e) { return null; }
 }
+
+/* ── preferências locais apenas ── */
+const LS = { name:'tatu_name', setor:'tatu_setor' };
+['tatu_totalPieces','tatu_topScores','tatu_sectorTotals'].forEach(k => localStorage.removeItem(k));
 
 /* ── 8 setores ── */
 const SETORES = [
-  { id:'diretoria',  name:'Diretoria',       color:'#a16207' },
-  { id:'comercial',  name:'Comercial',       color:'#2563eb' },
-  { id:'operacional',name:'Operacional',     color:'#ea580c' },
-  { id:'financeiro', name:'Financeiro',      color:'#16a34a' },
-  { id:'rh',         name:'RH & Pessoas',   color:'#7c3aed' },
-  { id:'logistica',  name:'Logística',       color:'#0891b2' },
-  { id:'suprimentos',name:'Suprimentos',     color:'#dc2626' },
-  { id:'ti',         name:'Dados',            color:'#ca8a04' },
-  { id:'posvendas',  name:'Pós Vendas',      color:'#db2777' }
+  { id:'comercial',  name:'Comercial',   color:'#2563eb' },
+  { id:'operacional',name:'Operacional', color:'#ea580c' },
+  { id:'financeiro', name:'Financeiro',  color:'#16a34a' },
+  { id:'rh',         name:'RH & Pessoas',color:'#7c3aed' },
+  { id:'logistica',  name:'Logística',   color:'#0891b2' },
+  { id:'suprimentos',name:'Suprimentos', color:'#dc2626' },
+  { id:'dados',      name:'Dados',       color:'#ca8a04' },
+  { id:'posvendas',  name:'Pós Vendas',  color:'#db2777' }
 ];
 let player = { name:'Tatu', setor:SETORES[0] };
 
@@ -348,14 +356,57 @@ function selectSetor(id){
 }
 const nameInput = document.getElementById('nameInput');
 nameInput.value = localStorage.getItem(LS.name) || '';
-selectSetor(localStorage.getItem(LS.setor) || 'diretoria');
-refreshTotals();
+selectSetor(localStorage.getItem(LS.setor) || 'comercial');
 
-/* ── session ── */
+/* ── renderiza placar global ── */
+function renderBoard(data, scoresId, setorId, hlName, hlScore) {
+  const ol = document.getElementById(scoresId);
+  if (ol) {
+    ol.innerHTML = '';
+    if (!data.players || !data.players.length) {
+      ol.innerHTML = '<li style="opacity:.35;font-size:10px;padding:4px 8px">Nenhum placar ainda</li>';
+    } else {
+      data.players.forEach((p, i) => {
+        const li = document.createElement('li');
+        if (p.name === hlName && p.score === hlScore) li.classList.add('you');
+        li.innerHTML =
+          '<span>' + (i+1) + '. ' + esc(p.name) +
+          ' <span class="s-sub">[' + esc(p.setor) + ']</span></span>' +
+          '<span>🧩 ' + p.score + '</span>';
+        ol.appendChild(li);
+      });
+    }
+  }
+  const ul = document.getElementById(setorId);
+  if (ul) {
+    ul.innerHTML = '';
+    const totals = data.sectorTotals || {};
+    const sorted = SETORES.map(s=>({...s, total: totals[s.id]||0})).sort((a,b)=>b.total-a.total);
+    const max = sorted[0].total || 1;
+    sorted.forEach(s=>{
+      const li = document.createElement('li');
+      if (s.id === player.setor.id) li.classList.add('mine');
+      const pct = Math.round(s.total/max*100);
+      li.innerHTML =
+        '<span class="s-dot" style="background:'+s.color+'"></span>'+
+        '<span class="s-name" style="color:'+(s.id===player.setor.id?'#F5A500':'inherit')+'">'+esc(s.name)+'</span>'+
+        '<span class="s-bar-wrap"><span class="s-bar" style="width:'+pct+'%;background:'+s.color+'"></span></span>'+
+        '<span class="s-val">'+s.total+'</span>';
+      ul.appendChild(li);
+    });
+  }
+  const ctEl = document.getElementById('companyTotal');
+  if (ctEl) ctEl.textContent = (data.companyTotal||0).toLocaleString('pt-BR');
+}
+
+/* ── carrega placar ao abrir ── */
+fetchScores().then(data => { if (data) renderBoard(data, 'startTopScores', 'startSetorRank'); });
+
+/* ── sessão ── */
 let sessionAttempts = [];
 const MAX_ATTEMPTS = 3;
 
-/* ── audio ── */
+/* ── áudio ── */
 let actx=null;
 function ac(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return actx; }
 function beep(freq,dur,type='square',vol=0.13,slideTo){
@@ -375,7 +426,7 @@ const sfx = {
   over:  ()=>{ beep(330,0.2,'square',0.14,200); setTimeout(()=>beep(200,0.3,'square',0.14,130),180); }
 };
 
-/* ── game state ── */
+/* ── estado do jogo ── */
 let state = 'start';
 let groundY, tatu, obstacles, pieces, clouds, hills, particles;
 let speed, dist, score, spawnT, pieceT, holdJump, jumpHeld;
@@ -393,7 +444,6 @@ function reset(){
   updateHud();
 }
 
-/* ── input ── */
 function jump(){
   if(state!=='play') return;
   if(tatu.onGround){ tatu.vy=-12.5; tatu.onGround=false; holdJump=1; jumpHeld=true; sfx.jump(); }
@@ -407,7 +457,6 @@ window.addEventListener('keydown', e=>{
 });
 window.addEventListener('keyup', e=>{ if(e.code==='Space') endJump(); });
 
-/* ── buttons ── */
 document.getElementById('startBtn').onclick  = startSession;
 document.getElementById('retryBtn').onclick  = startSession;
 document.getElementById('nextBtn').onclick   = nextAttempt;
@@ -452,19 +501,17 @@ function togglePause(){
 function quitToStart(){
   hideAll(); state='start';
   document.getElementById('start').classList.remove('hidden');
-  refreshTotals();
+  fetchScores().then(data => { if(data) renderBoard(data, 'startTopScores', 'startSetorRank'); });
 }
 function hideAll(){
   ['start','pause','between','over'].forEach(id=>document.getElementById(id).classList.add('hidden'));
   document.getElementById('pauseBtn').classList.remove('show');
   document.getElementById('count').classList.remove('show');
 }
-
 function updateHud(){
   const n = sessionAttempts.length + 1;
   document.getElementById('hudAtt').textContent = 'Tentativa '+n+'/'+MAX_ATTEMPTS;
 }
-
 function burst(x,y,color){
   for(let i=0;i<10;i++){
     const a=Math.random()*Math.PI*2, sp=1.4+Math.random()*3;
@@ -472,7 +519,6 @@ function burst(x,y,color){
   }
 }
 
-/* ── draw helpers ── */
 function drawTatu(t){
   ctx.save(); ctx.translate(t.x,t.y);
   ctx.fillStyle='#8a6a4f';
@@ -537,7 +583,6 @@ function drawBackground(){
 
 const pieceColors=['#2563eb','#ea580c','#16a34a','#dc2626','#7c3aed','#0891b2','#ca8a04','#db2777'];
 
-/* ── main loop ── */
 function loop(){
   requestAnimationFrame(loop);
   ctx.clearRect(0,0,W,H);
@@ -609,7 +654,7 @@ function loop(){
       const dx=p.x-tatu.x, dy=p.y-(tatu.y-tatu.h*.5);
       if(dx*dx+dy*dy<34*34){
         burst(p.x,p.y,p.color); sfx.piece();
-        pieces.splice(i,1); score++; addTotal(1); continue;
+        pieces.splice(i,1); score++; continue;
       }
       if(p.x<-40) pieces.splice(i,1);
     }
@@ -634,18 +679,15 @@ function drawParticles(){
   ctx.globalAlpha=1;
 }
 
-/* ── collision ── */
 function hitObstacle(){
   sfx.hit();
   state='between';
   document.getElementById('pauseBtn').classList.remove('show');
   sessionAttempts.push(score);
-  refreshTotals();
   if(sessionAttempts.length < MAX_ATTEMPTS) showBetween();
   else { sfx.over(); showOver(); }
 }
 
-/* ── tier message ── */
 function tierMsg(s){
   if(s<=7)  return { label:'Bora aquecer! 💪', msg:'Concentração e Disciplina te levam mais longe. Força total na próxima tentativa!' };
   if(s<=15) return { label:'Pegando o ritmo! 🎯', msg:'Já aparece o foco! Com constância você vai muito além.' };
@@ -653,7 +695,6 @@ function tierMsg(s){
   return      { label:'Foco de mestre! 🏆', msg:'Resultado incrível! Você levou seu setor ao topo do ranking.' };
 }
 
-/* ── attempt cards ── */
 function buildCards(containerId, highlightCurrent){
   const el=document.getElementById(containerId); el.innerHTML='';
   const best=sessionAttempts.length?Math.max(...sessionAttempts):null;
@@ -678,67 +719,35 @@ function showBetween(){
   document.getElementById('between').classList.remove('hidden');
 }
 
-/* ── sector ranking ── */
-function renderSectorRanking(){
-  const totals = getSectorTotals();
-  const sorted = SETORES
-    .map(s=>({ ...s, total: totals[s.id]||0 }))
-    .sort((a,b)=>b.total-a.total);
-  const max = sorted[0].total || 1;
-  const ul = document.getElementById('setorRank');
-  ul.innerHTML='';
-  sorted.forEach(s=>{
-    const li=document.createElement('li');
-    const isMine = s.id===player.setor.id;
-    if(isMine) li.classList.add('mine');
-    const pct=Math.round(s.total/max*100);
-    li.innerHTML=
-      '<span class="s-dot" style="background:'+s.color+'"></span>'+
-      '<span class="s-name" style="color:'+(isMine?'#F5A500':'inherit')+'">'+esc(s.name)+'</span>'+
-      '<span class="s-bar-wrap"><span class="s-bar" style="width:'+pct+'%;background:'+s.color+'"></span></span>'+
-      '<span class="s-val">'+s.total+'</span>';
-    ul.appendChild(li);
-  });
-}
-
 function showOver(){
   const best=Math.max(...sessionAttempts);
   const t=tierMsg(best);
-
-  addSectorTotal(player.setor.id, best);
-
   document.getElementById('overTitle').textContent='Parabéns, '+player.name+'!';
   document.getElementById('finalScore').textContent='🧩 Melhor: '+best+' peça'+(best!==1?'s':'');
   document.getElementById('tierPill').textContent=t.label;
   document.getElementById('overMsg').textContent=t.msg;
   buildCards('overCards', false);
-
-  const scores=getTopScores();
-  scores.push({name:player.name, score:best, setor:player.setor.name});
-  scores.sort((a,b)=>b.score-a.score);
-  const top=scores.slice(0,5);
-  saveTopScores(top);
-  const ol=document.getElementById('topScores'); ol.innerHTML='';
-  let marked=false;
-  top.forEach(e=>{
-    const li=document.createElement('li');
-    const isYou=!marked && e.name===player.name && e.score===best;
-    if(isYou){ li.classList.add('you'); marked=true; }
-    li.innerHTML='<span>'+esc(e.name)+'</span><span>🧩 '+e.score+'</span>';
-    ol.appendChild(li);
-  });
-
-  renderSectorRanking();
-  refreshTotals();
+  document.getElementById('globalRankBadge').style.display='none';
+  document.getElementById('topScores').innerHTML='<li style="opacity:.35;font-size:10px;padding:4px 8px">Salvando…</li>';
+  document.getElementById('setorRank').innerHTML='';
   document.getElementById('over').classList.remove('hidden');
   state='over';
+
+  postScore(player.name, player.setor.name, player.setor.id, best).then(data => {
+    if (!data) return;
+    renderBoard(data, 'topScores', 'setorRank', player.name, best);
+    renderBoard(data, 'startTopScores', 'startSetorRank');
+    if (data.rank) {
+      document.getElementById('globalRankText').textContent = 'Posição global: #' + data.rank;
+      document.getElementById('globalRankBadge').style.display = '';
+    }
+  });
 }
 
 function esc(s){
   return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* ── share ── */
 function shareResult(){
   const best=Math.max(...sessionAttempts);
   const text='🧩 Coletei '+best+' peças no Tatu Saudável da Máquina Solo! Bora superar? ['+player.setor.name+']';
