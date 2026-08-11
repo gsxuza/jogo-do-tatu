@@ -1,50 +1,91 @@
-const DAY_MS = 24 * 60 * 60 * 1000;
+const DAY_MS    = 24 * 60 * 60 * 1000;
+const STORE_KEY = 'tatu:store';
 
-let store = { players: [], companyTotal: 0, rateLimit: {} };
+const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+// In-memory cache — used within the same warm Lambda instance
+let mem = null;
+
+async function redisCmd(...args) {
+  if (!REDIS_URL) return null;
+  try {
+    const r = await fetch(REDIS_URL, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args)
+    });
+    const j = await r.json();
+    return j.result ?? null;
+  } catch (e) { return null; }
+}
+
+async function loadStore() {
+  if (mem) return; // already cached this instance
+  const raw = await redisCmd('GET', STORE_KEY);
+  if (raw) {
+    try { mem = JSON.parse(raw); } catch (e) {}
+  }
+  if (!mem || !mem.players) {
+    mem = { players: [], companyTotal: 0, rateLimit: {} };
+  }
+  mem.players     = mem.players     || [];
+  mem.companyTotal = mem.companyTotal || 0;
+  mem.rateLimit   = mem.rateLimit   || {};
+}
+
+async function saveStore() {
+  await redisCmd('SET', STORE_KEY, JSON.stringify(mem));
+}
 
 function buildPayload() {
   const sectorTotals = {};
-  for (const p of store.players) {
+  for (const p of mem.players) {
     sectorTotals[p.setorId] = (sectorTotals[p.setorId] || 0) + p.score;
   }
-  return { players: store.players, companyTotal: store.companyTotal, sectorTotals };
+  return { players: mem.players, companyTotal: mem.companyTotal, sectorTotals };
 }
 
-module.exports = function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  await loadStore();
 
   if (req.method === 'GET') {
     return res.status(200).json(buildPayload());
   }
 
   if (req.method === 'POST') {
-    const b = req.body || {};
+    const b       = req.body || {};
     const name    = String(b.name    || 'Anônimo').slice(0, 20);
     const setor   = String(b.setor   || '');
     const setorId = String(b.setorId || '');
     const score   = Math.max(0, parseInt(b.score, 10) || 0);
 
-    const key = name.toLowerCase().trim() + ':' + setorId;
-    const lastPlay = store.rateLimit[key];
+    const key      = name.toLowerCase().trim() + ':' + setorId;
+    const lastPlay = mem.rateLimit[key];
     if (lastPlay && (Date.now() - lastPlay) < DAY_MS) {
       return res.status(200).json({ ...buildPayload(), rateLimited: true, nextAllowed: lastPlay + DAY_MS });
     }
 
-    store.rateLimit[key] = Date.now();
+    mem.rateLimit[key] = Date.now();
     const entry = { name, setor, setorId, score, ts: Date.now() };
-    store.companyTotal += score;
-    store.players.push(entry);
-    store.players.sort((a, b) => b.score - a.score);
-    const rank = store.players.indexOf(entry) + 1;
-    if (store.players.length > 500) store.players = store.players.slice(0, 500);
+    mem.companyTotal += score;
+    mem.players.push(entry);
+    mem.players.sort((a, b) => b.score - a.score);
+    const rank = mem.players.indexOf(entry) + 1;
+    if (mem.players.length > 500) mem.players = mem.players.slice(0, 500);
+
+    await saveStore();
     return res.status(200).json({ ...buildPayload(), rank });
   }
 
   if (req.method === 'DELETE') {
-    store = { players: [], companyTotal: 0, rateLimit: {} };
+    mem = { players: [], companyTotal: 0, rateLimit: {} };
+    await saveStore();
     return res.status(200).json({ ok: true });
   }
 
