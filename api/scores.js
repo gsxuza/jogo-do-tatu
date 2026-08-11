@@ -55,6 +55,22 @@ module.exports = async function handler(req, res) {
   await loadStore();
 
   if (req.method === 'GET') {
+    const qs = new URL(req.url, 'http://localhost').searchParams;
+    if (qs.get('debug') === '1') {
+      let redisOk = false, redisError = null;
+      try {
+        await redisCmd('SET', 'tatu:ping', 'pong');
+        const pong = await redisCmd('GET', 'tatu:ping');
+        redisOk = pong === 'pong';
+      } catch(e) { redisError = String(e); }
+      return res.status(200).json({
+        redisConfigured: !!REDIS_URL,
+        redisOk,
+        redisError,
+        players: mem.players.length,
+        ...buildPayload()
+      });
+    }
     return res.status(200).json(buildPayload());
   }
 
