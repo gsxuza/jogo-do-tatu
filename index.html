@@ -149,7 +149,7 @@
     font-size:clamp(9px,1.6vw,11px); font-weight:700; text-transform:uppercase;
     opacity:.48; margin-bottom:6px; letter-spacing:.6px;
   }
-  .scores { list-style:none; padding:0; }
+  .scores { list-style:none; padding:0; max-height:240px; overflow-y:auto; }
   .scores li {
     display:flex; justify-content:space-between;
     padding:4px 8px; border-radius:6px;
@@ -247,7 +247,7 @@
     <div class="lbl">Placar Global</div>
     <div class="rankings">
       <div class="rank-col">
-        <div class="rank-title">🏆 Top jogadores</div>
+        <div class="rank-title">🏆 Todos os jogadores</div>
         <ol class="scores" id="startTopScores"><li style="opacity:.35;font-size:10px;padding:4px 8px">Carregando…</li></ol>
       </div>
       <div class="rank-col">
@@ -292,7 +292,7 @@
     <p class="desc" id="overMsg"></p>
     <div class="rankings">
       <div class="rank-col">
-        <div class="rank-title">🏆 Top 10 global</div>
+        <div class="rank-title">🏆 Todos os jogadores</div>
         <ol class="scores" id="topScores"></ol>
       </div>
       <div class="rank-col">
@@ -340,17 +340,17 @@ const LS = { name:'tatu_name', setor:'tatu_setor' };
 ['tatu_totalPieces','tatu_topScores','tatu_sectorTotals'].forEach(k => localStorage.removeItem(k));
 
 /* ── trava semanal (chave = nome + setor) ── */
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 function getPlayedTimes(){ try{ return JSON.parse(localStorage.getItem('tatu_played')||'{}'); }catch(e){ return {}; } }
 function playedKey(name,id){ return (name||'').toLowerCase().trim()+':'+id; }
-function isRateLimited(name,id){ const t=getPlayedTimes()[playedKey(name,id)]; return !!(t&&(Date.now()-t)<WEEK_MS); }
-function timeLeft(name,id){ const t=getPlayedTimes()[playedKey(name,id)]; return t?Math.max(0,t+WEEK_MS-Date.now()):0; }
+function isRateLimited(name,id){ const t=getPlayedTimes()[playedKey(name,id)]; return !!(t&&(Date.now()-t)<DAY_MS); }
+function timeLeft(name,id){ const t=getPlayedTimes()[playedKey(name,id)]; return t?Math.max(0,t+DAY_MS-Date.now()):0; }
 function fmtTime(ms){ const d=Math.floor(ms/86400000),h=Math.floor(ms%86400000/3600000),m=Math.floor(ms%3600000/60000); return d?d+'d '+h+'h':h?h+'h '+m+'min':Math.max(1,m)+'min'; }
 function updateRateLimitUI(){
   const nm=(nameInput.value||'').trim();
   const lim=nm && isRateLimited(nm, player.setor.id);
   const n=document.getElementById('rateLimitNotice'), b=document.getElementById('startBtn');
-  if(lim){ n.textContent='⏳ '+nm+' já jogou neste setor esta semana. Próxima tentativa em '+fmtTime(timeLeft(nm, player.setor.id))+'.'; n.style.display=''; b.classList.add('disabled'); }
+  if(lim){ n.textContent='⏳ '+nm+' já jogou neste setor hoje. Próxima tentativa em '+fmtTime(timeLeft(nm, player.setor.id))+'.'; n.style.display=''; b.classList.add('disabled'); }
   else{ n.style.display='none'; b.classList.remove('disabled'); }
 }
 
@@ -790,7 +790,7 @@ function showOver(){
   postScore(player.name, player.setor.name, player.setor.id, best).then(data => {
     if (!data) return;
     if (data.rateLimited) {
-      document.getElementById('topScores').innerHTML='<li style="opacity:.35;font-size:10px;padding:4px 8px">Placar não registrado: você já jogou neste setor esta semana.</li>';
+      document.getElementById('topScores').innerHTML='<li style="opacity:.35;font-size:10px;padding:4px 8px">Placar não registrado: você já jogou neste setor hoje.</li>';
     } else {
       renderBoard(data, 'topScores', 'setorRank', player.name, best);
       renderBoard(data, 'startTopScores', 'startSetorRank');

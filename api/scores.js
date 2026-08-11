@@ -1,4 +1,4 @@
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 let store = { players: [], companyTotal: 0, rateLimit: {} };
 
@@ -7,7 +7,7 @@ function buildPayload() {
   for (const p of store.players) {
     sectorTotals[p.setorId] = (sectorTotals[p.setorId] || 0) + p.score;
   }
-  return { players: store.players.slice(0, 10), companyTotal: store.companyTotal, sectorTotals };
+  return { players: store.players, companyTotal: store.companyTotal, sectorTotals };
 }
 
 module.exports = function handler(req, res) {
@@ -29,8 +29,8 @@ module.exports = function handler(req, res) {
 
     const key = name.toLowerCase().trim() + ':' + setorId;
     const lastPlay = store.rateLimit[key];
-    if (lastPlay && (Date.now() - lastPlay) < WEEK_MS) {
-      return res.status(200).json({ ...buildPayload(), rateLimited: true, nextAllowed: lastPlay + WEEK_MS });
+    if (lastPlay && (Date.now() - lastPlay) < DAY_MS) {
+      return res.status(200).json({ ...buildPayload(), rateLimited: true, nextAllowed: lastPlay + DAY_MS });
     }
 
     store.rateLimit[key] = Date.now();
@@ -39,7 +39,7 @@ module.exports = function handler(req, res) {
     store.players.push(entry);
     store.players.sort((a, b) => b.score - a.score);
     const rank = store.players.indexOf(entry) + 1;
-    if (store.players.length > 100) store.players = store.players.slice(0, 100);
+    if (store.players.length > 500) store.players = store.players.slice(0, 500);
     return res.status(200).json({ ...buildPayload(), rank });
   }
 
