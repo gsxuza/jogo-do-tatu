@@ -331,14 +331,14 @@ const LS = { name:'tatu_name', setor:'tatu_setor' };
 
 /* ── 8 setores ── */
 const SETORES = [
-  { id:'comercial',  name:'Comercial',       color:'#dc2626' },
-  { id:'operacional',name:'Operacional',     color:'#1f2937' },
-  { id:'financeiro', name:'Financeiro',      color:'#92400e' },
-  { id:'marketing',  name:'Marketing',       color:'#ca8a04' },
-  { id:'logistica',  name:'Logística',       color:'#15803d' },
-  { id:'suprimentos',name:'Suprimentos',     color:'#2563eb' },
-  { id:'domgestao',  name:'Dom. e Gestão',   color:'#ea580c' },
-  { id:'posvendas',  name:'Pós Vendas',      color:'#7c3aed' }
+  { id:'posvendas',     name:'Pós Vendas',                        color:'#7c3aed' },
+  { id:'comex',         name:'Comex · Supr · Estoque · Facilities', color:'#15803d' },
+  { id:'engdadosti',    name:'Eng · Dados · TI',                  color:'#ea580c' },
+  { id:'comercial',     name:'Comercial',                          color:'#dc2626' },
+  { id:'marketing',     name:'Marketing',                          color:'#ca8a04' },
+  { id:'operacional',   name:'Operacional',                        color:'#1f2937' },
+  { id:'admfinanceiro', name:'Adm. Financeiro',                    color:'#92400e' },
+  { id:'gentegestao',   name:'Gente e Gestão',                     color:'#2563eb' }
 ];
 let player = { name:'Tatu', setor:SETORES[0] };
 
@@ -581,7 +581,7 @@ function drawBackground(){
   for(const h of hills){ ctx.beginPath(); ctx.ellipse(h.x+35,groundY+6,h.r*.64,h.r*.37,0,Math.PI,0); ctx.fill(); }
 }
 
-const pieceColors=['#dc2626','#1f2937','#92400e','#ca8a04','#15803d','#2563eb','#ea580c','#7c3aed'];
+const pieceColors=['#7c3aed','#15803d','#ea580c','#dc2626','#ca8a04','#1f2937','#92400e','#2563eb'];
 
 function loop(){
   requestAnimationFrame(loop);
