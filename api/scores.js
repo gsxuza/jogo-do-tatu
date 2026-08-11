@@ -1,8 +1,8 @@
 const DAY_MS    = 24 * 60 * 60 * 1000;
 const STORE_KEY = 'tatu:store';
 
-const REDIS_URL   = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const REDIS_URL   = (process.env.UPSTASH_REDIS_REST_URL   || '').replace(/^["']|["']$/g, '').trim();
+const REDIS_TOKEN = (process.env.UPSTASH_REDIS_REST_TOKEN || '').replace(/^["']|["']$/g, '').trim();
 
 // In-memory cache — used within the same warm Lambda instance
 let mem = null;
