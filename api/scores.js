@@ -48,7 +48,7 @@ function buildPayload() {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -104,6 +104,16 @@ module.exports = async function handler(req, res) {
 
     await saveStore();
     return res.status(200).json({ ...buildPayload(), rank });
+  }
+
+  if (req.method === 'PUT') {
+    const b = req.body || {};
+    if (!Array.isArray(b.players)) return res.status(400).json({ error: 'players array required' });
+    mem.players = b.players;
+    mem.players.sort((a, c) => c.score - a.score);
+    mem.companyTotal = mem.players.reduce((s, p) => s + (p.score || 0), 0);
+    await saveStore();
+    return res.status(200).json(buildPayload());
   }
 
   if (req.method === 'DELETE') {
